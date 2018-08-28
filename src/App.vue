@@ -1,11 +1,15 @@
 <template>
   <div id="app">
+    
+    <!-- Header -->
     <headerHome/>          
     
+    <!-- Main -->
     <main>
-      <home/>
+      <router-view></router-view>
     </main>
     
+    <!-- Footer -->
     <footerHome/>
 
   </div>
@@ -13,7 +17,8 @@
 
 <script>
 
-// Import dos componentes utilizados na página home
+// Import das páginas da plataforma
+import Login from './components/pages/Login'
 import Home from './components/pages/Home'
 import HeaderHome from './components/pages/Header-home'
 import FooterHome from './components/pages/Footer-home'
@@ -21,6 +26,7 @@ import FooterHome from './components/pages/Footer-home'
 export default {
   name: 'app',
   components: {
+    Login,
     Home,
     HeaderHome,
     FooterHome
@@ -29,8 +35,8 @@ export default {
 </script>
 
 <style lang="scss">
-@import './assets/styles/variables';
-@import './assets/styles/bootstrap';
+  @import './assets/styles/variables';
+  @import './assets/styles/bootstrap';
 </style>
 
 
