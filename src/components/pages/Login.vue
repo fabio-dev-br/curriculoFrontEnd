@@ -8,11 +8,10 @@
                 <div class="row justify-content-center align-items-center" id="login-row">
                     <div class="card">
                         <div class="card-body">
-                            <b-form>
+                            <b-form @submit="validate">
                                 <!-- E-mail -->
-                                <b-form-group>
-                                    <span class="glyphicon glyphicon-envelope"></span>
-                                    <b-form-text for="userEmail">Seu e-mail</b-form-text>
+                                <b-form-group>                                    
+                                    <b-form-text for="userEmail"><icon name="envelope"></icon> Seu e-mail</b-form-text>
                                     <b-form-input type="email"
                                         id="userEmail"  
                                         v-model="email"
@@ -21,8 +20,7 @@
                                 
                                 <!-- Senha -->
                                 <b-form-group>
-                                    <i class="fa fa-lock prefix grey-text"></i>
-                                    <b-form-text for="userPassword">Sua senha</b-form-text>
+                                    <b-form-text for="userPassword"><icon name="lock"></icon> Sua senha</b-form-text>
                                     <b-form-input type="password"
                                         id="userPassword" 
                                         v-model="password"
@@ -45,9 +43,7 @@
     
                                 <!-- Botão de login - ao clicar chama a função no loginCurriculo.js para fazer o login -->
                                 <div class="d-flex flex-column align-items-center mt-4 my-2">
-                                    <b-btn class="btn btn-outline-dark my-2" 
-                                        @click="login()"
-                                        :disabled="!isValid">
+                                    <b-btn class="btn btn-outline-dark my-2" type="submit">
                                         Fazer login
                                     </b-btn>                            
                                 </div>
@@ -75,34 +71,43 @@ export default {
         }
     },
     methods: {
+        // Método para intermediar a validação do formulário
+        validate($event) {
+            if(this.isValid) {
+                this.login();
+            }
+            // Previne o recarregamento da página (ou seja, que o evento de submit aconteça)
+            $event.preventDefault();
+        },
         // Método para fazer o login
         login() {
-            if(this.isValid()) {
-                // Requisição POST para logar na plataforma
-                API.post('/login2', {
-                    email: this.email,
-                    password: this.password
-                }).then(response => {
-                    // Se o usuário é uma empresa (user_type = 0) redireciona para o portal da empresa
-                    if(response.data.data.user_type == 0) {
-                        this.$router.push('/portal-empresa');
-                    }
-
-                    // Se o usuário é uma pessoa (user_type = 1) redireciona para o portal de pessoa
-                    if(response.data.data.user_type == 1) {
-                        this.$router.push('/portal-pessoa');
-                    }
-                }).catch(error => {
-                    this.error = error.response.data.message;
-                });
-            }
+            // Requisição POST para fazer o login
+            API.post('/login2', {
+                email: this.email,
+                password: this.password
+            }).then(response => {
+                // Armazena o token recebido do back-end, este que é usado
+                // para recuperar as informações presentes no back-end
+                this.$store.commit('setAuthToken', response.data.data.token);
+                
+                // Se o usuário é uma empresa (user_type = 0) redireciona para o portal da empresa
+                if(response.data.data.user_type == 0) {
+                    this.$router.push('/portal-empresa');
+                }
+                
+                // Se o usuário é uma pessoa (user_type = 1) redireciona para o portal de pessoa
+                if(response.data.data.user_type == 1) {
+                    this.$router.push('/portal-pessoa');
+                }
+            }).catch(error => {
+                this.error = error.response.data.message;
+            });
         }
     },
     computed: {
         isValid() {
-            // deve garantir que o formulário é valido
-            return true;
+            return this.email && this.password.length > 4;
         }
     }
-}
+};
 </script>

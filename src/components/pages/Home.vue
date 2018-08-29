@@ -17,13 +17,13 @@
                         <div class="col-sm mt-4">
                             <!-- Botão para abrir o modal de cadastro de empresas -->
                             <b-button class="btn btn-lg btn-primary" @click="showModalCompany"> 
-                            Cadastro de empresas 
+                                Cadastro de empresas 
                             </b-button>
                         </div>
                         <div class="col-sm mt-4">
                             <!-- Botão para abrir o modal de cadastro de pessoas -->
                             <b-button class="btn btn-lg btn-primary" @click="showModalPerson">
-                            Cadastro de pessoas
+                                Cadastro de pessoas
                             </b-button>
                         </div>
                     </div>
@@ -42,7 +42,7 @@
             <!-- Modal body -->
             <div class="modal-body">
                 <!-- Formulário de empresa, contém: nome, email, cnpj, senha e tipo de usuário(empresa = 0) -->
-                <b-form id="companyForm">
+                <b-form id="companyForm" @submit="validateCompany">
                     <!-- Nome -->
                     <b-form-group>
                         <b-form-text for="companyName"> Nome da empresa </b-form-text>                      
@@ -82,7 +82,7 @@
                     <!-- Modal footer (Quando há o clique no botão enviar a variável user_type recebe 0) -->
                     <div class="modal-footer">              
                         <b-btn variant="outline-danger" @click="hideModalCompany">Fechar</b-btn>
-                        <b-btn variant="outline-success" @click="user_type = 0 , sendInfo()">Enviar</b-btn>
+                        <b-btn variant="outline-success" type="submit">Enviar</b-btn>
                     </div>
                 </b-form>
             </div>
@@ -99,8 +99,7 @@
             <!-- Modal body -->
             <div class="modal-body">
                 <!-- Formulário de pessoa, contém: nome, email, cpf, senha e tipo de usuário(pessoa = 1) -->
-                <b-form id="personForm">
-                    
+                <b-form id="personForm" @submit="validatePerson">                    
                     <!-- Nome -->
                     <b-form-group>
                         <b-form-text for="personName"> Nome </b-form-text>
@@ -140,7 +139,7 @@
                     <!-- Modal footer (Quando há o clique no botão enviar a variável user_type recebe 1) -->
                     <div class="modal-footer">              
                         <b-btn variant="outline-danger" @click="hideModalPerson">Fechar</b-btn>
-                        <b-btn variant="outline-success" @click="user_type = 1 , sendInfo()">Enviar</b-btn>
+                        <b-btn variant="outline-success" type="submit">Enviar</b-btn>
                     </div>
                 </b-form>
             </div>    
@@ -156,114 +155,70 @@ import API from '../../services/ApiService';
 export default {
     name:"home",
     data () {
-    return {
-      modalRegCompShow: false,
-      modalRegPerShow: false,
-      name: '',
-      email: '',
-      identity: '',
-      user_type: '',
-      password: ''
+        return {
+            modalRegCompShow: false,
+            modalRegPerShow: false,
+            name: '',
+            email: '',
+            identity: '',
+            user_type: '',
+            password: '',
+            error: null
     }
-  },
-  methods: {
-    // Método para enviar as informações para o cadastro
-    sendInfo: function() {      
-        if(this.isValid()){
-            // Requisição POST para logar na plataforma
+    },
+    methods: {
+        // Método para intermediar a validação do formulário de empresa
+        validateCompany($event) {
+            if(this.isValid) {
+                this.user_type = 0;
+                this.sendInfo();
+            }
+            // Previne o recarregamento da página (ou seja, que o evento de submit aconteça)
+            $event.preventDefault();
+        },
+        // Método para intermediar a validação do formulário de pessoa
+        validatePerson($event) {
+            if(this.isValid) {
+                this.user_type = 1;
+                this.sendInfo();
+            }
+            // Previne o recarregamento da página (ou seja, que o evento de submit aconteça)
+            $event.preventDefault();
+        },
+        // Método para enviar as informações para o cadastro
+        sendInfo() {      
+            // Requisição POST para cadastrar na plataforma
             API.post('/newAccount', {
                 name: this.name,
                 email: this.email,
                 identity: this.identity,
                 user_type: this.user_type,
                 password: this.password
-            }).then(response => {
-                // Se o usuário é uma empresa (user_type = 0) redireciona para o portal da empresa
-                if(response.data.data.user_type == 0) {
-                    this.$router.push('/portal-empresa');
-                }
-
-                // Se o usuário é uma pessoa (user_type = 1) redireciona para o portal de pessoa
-                if(response.data.data.user_type == 1) {
-                    this.$router.push('/portal-pessoa');
-                }
+            }).then(function () {
+                // Redireciona para o login em caso de sucesso
+                this.$router.push('/login');                    
             }).catch(error => {
                 this.error = error.response.data.message;
-            });
+            }); 
+        },
+        showModalCompany () {
+            this.$refs.modalRegCompany.show()
+        },
+        hideModalCompany () {
+            this.$refs.modalRegCompany.hide()
+        },
+        showModalPerson () {
+            this.$refs.modalRegPerson.show()
+        },
+        hideModalPerson () {
+            this.$refs.modalRegPerson.hide()
         }
-
-        // $.post('/newAccount', {
-        //     name: this.name,
-        //     email: this.email,
-        //     identity: this.identity,
-        //     user_type: this.user_type,
-        //     password: this.password
-        // }, null, 'json').then(r => {
-        //     console.log(r);
-        // }, err => {
-        //     console.log(err.responseJSON);
-        // });              
     },
-    showModalCompany () {
-      this.$refs.modalRegCompany.show()
-    },
-    hideModalCompany () {
-      this.$refs.modalRegCompany.hide()
-    },
-    showModalPerson () {
-      this.$refs.modalRegPerson.show()
-    },
-    hideModalPerson () {
-      this.$refs.modalRegPerson.hide()
-    }
-  },
-  computed: {
+    computed: {
       isValid() {
         // deve garantir que o formulário é valido
         return true;  
-      }
-  }
-}
-
-
-
-
-// var companyModal = new Vue({
-//     el: '#companyModal',
-//     data: {
-//         name: '',
-//         email: '',
-//         identity: '',
-//         user_type: '',
-//         password: ''
-//     },
-//     methods: {
-        // sendInfo() {
-        //     if(!this.isValid()){
-        //         alert("Preencha todos os campos!!!");
-        //     }
-  
-        //     $.post('/newAccount', {
-        //         name: this.name,
-        //         email: this.email,
-        //         identity: this.identity,
-        //         user_type: this.user_type,
-        //         password: this.password
-        //     }, null, 'json').then(r => {
-        //         console.log(r);
-        //     }, err => {
-        //         console.log(err.responseJSON);
-        //     });
-        // },
-        // isValid() {
-        //     return  this.name && 
-        //             this.email && 
-        //             this.identity && 
-        //             this.password;
-        // }
-//     },
-//     computed: {
-        
-//     }
-// });
+        }
+    }
+};
 </script>
