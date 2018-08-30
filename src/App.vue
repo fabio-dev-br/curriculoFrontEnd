@@ -37,7 +37,7 @@ export default {
 <style lang="scss">
   @import './assets/styles/variables';
   @import './assets/styles/bootstrap';
-  /* @import './assets/styles/css/vue-tags'; */
+  @import "./../node_modules/@voerro/vue-tagsinput/dist/style.css";
 </style>
 
 

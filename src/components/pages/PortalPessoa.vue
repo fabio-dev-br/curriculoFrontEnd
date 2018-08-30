@@ -29,7 +29,7 @@
                     <!-- Área -->
                     <b-form-group>
                         <b-form-text for="curriculumArea"> Área </b-form-text>                                          
-                        <b-form-select id="curriculumArea" v-model="area">
+                        <b-form-select id="curriculumArea" v-model="area" required>
                             <template slot="first">
                                 <option :value="null" disabled> Escolha a área maior de atuação... *</option>
                             </template>                            
@@ -50,7 +50,8 @@
 
                     <!-- Arquivo de currículo -->
                     <b-form-group>
-                        <b-form-file v-model="file" :state="Boolean(file)" placeholder="Anexe um currículo..."></b-form-file>
+                        <b-form-file v-model="file" :state="Boolean(file)" 
+                            placeholder="Anexe um currículo..." required></b-form-file>
                         <div class="mt-3"><b-form-text class="font-weight-bold">Arquivo selecionado: {{file && file.name}}</b-form-text></div>
                         <!-- <input type="file" class="form-control-file"
                             id="curriculumFile"
@@ -63,7 +64,7 @@
                         <b-form-text for="curriculumInstitute"> Instituição de ensino </b-form-text>
                         <b-form-input type="text" 
                             id="curriculumInstitute"        
-                            v-model="course"
+                            v-model="institute"
                             placeholder="Digite o instituto de formação... *" required></b-form-input>
                     </b-form-group>
 
@@ -76,14 +77,16 @@
                             placeholder="yyyy *" required></b-form-input>
                     </b-form-group>
 
-                    <!-- Habilidades -->
-                    <b-form-group>
+                    <!-- Habilidades / Foi colocado um limite de 3 habilidades -->
+                    <b-form-group description="Digite no máximo 3 habilidades" label-size="lg">
                         <b-form-text for="habilitiesTags"> Principais habilidades </b-form-text>
                         <tags-input input-class="form-control"
                             element-id="habilitiesTags"
                             v-model="habilities"
+                            :limit = 3
                             placeholder="Digite uma habilidade"></tags-input> 
                     </b-form-group>
+
                     <!-- Modal footer -->
                     <div class="modal-footer">
                         <b-btn variant="outline-danger" @click="hideModalCurriculum">Fechar</b-btn>
@@ -98,7 +101,7 @@
 <script>
 
 // Imports necessários para fazer a requisição ao servidor
-import API from '../../services/ApiService';
+//import API from '../../services/ApiService';
 
 export default {
     name: "portalPessoa",
@@ -110,22 +113,27 @@ export default {
             file: null,
             institute: '',
             graduateYear: '',
-            habilities: []
+            habilities: [
+                'smart grid'                
+            ],
+            error: null
         }
     },
     methods: {
         // Método para intermediar a validação do formulário
         validateCurriculum($event) {
             if(this.isValid) {
-                alert("passou aqui");
-                //this.addCurriculum;
+                this.addCurriculum();
             }
             // Previne o recarregamento da página (ou seja, que o evento de submit aconteça)
             $event.preventDefault();
         },
         // Método para adicionar um currículo
         addCurriculum() {
-            // Requisição POST para adicionar um currículo
+            // O token  do usuário é recuperado e adicionado ao header da 
+            // requisição para enviá-lo ao back-end
+            API.token = this.$store.getters.authToken;
+            // Requisição POST para adicionar um currículo            
             API.post('/addCurriculum', {
                 area: this.area,   
                 course: this.course,
@@ -134,19 +142,7 @@ export default {
                 graduateYear: this.graduateYear,
                 habilities: this.habilities
             }).then(response => {
-                // Armazena o token recebido do back-end, este que é usado
-                // para recuperar as informações presentes no back-end
-                this.$store.commit('setAuthToken', response.data.data.token);
-                
-                // Se o usuário é uma empresa (user_type = 0) redireciona para o portal da empresa
-                if(response.data.data.user_type == 0) {
-                    this.$router.push('/portal-empresa');
-                }
-                
-                // Se o usuário é uma pessoa (user_type = 1) redireciona para o portal de pessoa
-                if(response.data.data.user_type == 1) {
-                    this.$router.push('/portal-pessoa');
-                }
+                alert("Currículo cadastrado com sucesso");
             }).catch(error => {
                 this.error = error.response.data.message;
             });
@@ -160,8 +156,28 @@ export default {
     },
     computed: {
         isValid() {
-            return this.email && this.password.length > 4;
+            // Fazer a validação posteriormente
+            return true;
         }
     }
 };
 </script>
+
+<style>
+.badge-light {
+    color: #f8ffff;
+    background-color: #4a5f5d;
+}
+
+.tags-input-remove:before, .tags-input-remove:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    left: 0;
+    background: #eaee20;
+    
+    height: 2px;
+    margin-top: -1px;
+}
+</style>
