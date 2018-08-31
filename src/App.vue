@@ -17,19 +17,17 @@
 
 <script>
 
-// Import das páginas da plataforma
-import Login from './components/pages/Login'
+// Import da página home
+import FooterHome from './components/pages/Footer-home'
 import Home from './components/pages/Home'
 import HeaderHome from './components/pages/Header-home'
-import FooterHome from './components/pages/Footer-home'
 
 export default {
   name: 'app',
   components: {
-    Login,
+    FooterHome,
     Home,
-    HeaderHome,
-    FooterHome
+    HeaderHome
   }
 }
 </script>

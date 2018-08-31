@@ -4,6 +4,7 @@ import Vue from "vue";
 import Home from "./../components/pages/Home";
 import Login from "./../components/pages/Login";
 import PortalPessoa from "./../components/pages/PortalPessoa";
+import PortalEmpresa from "./../components/pages/PortalEmpresa";
 
 import VueRouter from "vue-router";
 
@@ -11,6 +12,7 @@ const routes = [
   { path: "/", name: "home", component: Home },
   { path: "/login", name: "login", component: Login },
   { path: "/portal-pessoa", name: "portal-pessoa", component: PortalPessoa },
+  { path: "/portal-empresa", name: "portal-empresa", component: PortalEmpresa },
 ];
 
 const router = new VueRouter({

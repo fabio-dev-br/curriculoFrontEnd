@@ -24,7 +24,7 @@
                     
             <!-- Modal body -->
             <div class="modal-body">
-                <!-- Formulário de currículo, contém: área, curso, arquivo, instituto, ano de formação, id de usuário e habilidades-->
+                <!-- Formulário de currículo, contém: área, curso, arquivo, instituto, ano de formação, id de usuário e habilidades -->
                 <b-form id="curriculumForm" @submit="validateCurriculum">
                     <!-- Área -->
                     <b-form-group>
@@ -53,10 +53,6 @@
                         <b-form-file v-model="file" :state="Boolean(file)" 
                             placeholder="Anexe um currículo..." required></b-form-file>
                         <div class="mt-3"><b-form-text class="font-weight-bold">Arquivo selecionado: {{file && file.name}}</b-form-text></div>
-                        <!-- <input type="file" class="form-control-file"
-                            id="curriculumFile"
-                            v-on:change="onFileSelected"
-                            required>  -->
                     </b-form-group>
 
                     <!-- Instituição de ensino -->
@@ -101,7 +97,7 @@
 <script>
 
 // Imports necessários para fazer a requisição ao servidor
-//import API from '../../services/ApiService';
+import API from '../../services/ApiService';
 
 export default {
     name: "portalPessoa",
@@ -122,9 +118,10 @@ export default {
     methods: {
         // Método para intermediar a validação do formulário
         validateCurriculum($event) {
-            if(this.isValid) {
+            if(this.isValid) {            
                 this.addCurriculum();
             }
+
             // Previne o recarregamento da página (ou seja, que o evento de submit aconteça)
             $event.preventDefault();
         },
@@ -133,6 +130,7 @@ export default {
             // O token  do usuário é recuperado e adicionado ao header da 
             // requisição para enviá-lo ao back-end
             API.token = this.$store.getters.authToken;
+
             // Requisição POST para adicionar um currículo            
             API.post('/addCurriculum', {
                 area: this.area,   
@@ -141,8 +139,9 @@ export default {
                 institute: this.institute,
                 graduateYear: this.graduateYear,
                 habilities: this.habilities
-            }).then(response => {
+            }).then(function () {
                 alert("Currículo cadastrado com sucesso");
+                this.$router.push('/portal-pessoa');
             }).catch(error => {
                 this.error = error.response.data.message;
             });
@@ -176,7 +175,6 @@ export default {
     top: 50%;
     left: 0;
     background: #eaee20;
-    
     height: 2px;
     margin-top: -1px;
 }
