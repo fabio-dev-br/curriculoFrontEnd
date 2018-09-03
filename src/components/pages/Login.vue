@@ -89,7 +89,7 @@ export default {
                 // Armazena o token recebido do back-end, este que é usado
                 // para recuperar as informações presentes no back-end
                 this.$store.commit('setAuthToken', response.data.data.token);
-                
+                console.log(this.$store.getters.authToken);
                 // Se o usuário é uma empresa (user_type = 0) redireciona para o portal da empresa
                 if(response.data.data.user_type == 0) {
                     this.$router.push('/portal-empresa');

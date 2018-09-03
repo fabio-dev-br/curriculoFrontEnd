@@ -196,8 +196,10 @@ export default {
                 password: this.password
             }).then(function () {
                 // Redireciona para o login em caso de sucesso
+                alert("pipoii")
                 this.$router.push('/login');                    
             }).catch(error => {
+                console.log(error.response);
                 this.error = error.response.data.message;
             }); 
         },

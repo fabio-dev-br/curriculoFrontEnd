@@ -79,7 +79,7 @@ export default {
             // O token  do usuário é recuperado e adicionado ao header da 
             // requisição para enviá-lo ao back-end
             API.token = this.$store.getters.authToken;
-            
+
             // Requisição POST para adicionar um currículo            
             API.post('/addInterests', {
                 interests: this.interests

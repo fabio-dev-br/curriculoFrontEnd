@@ -50,7 +50,7 @@
 
                     <!-- Arquivo de currículo -->
                     <b-form-group>
-                        <b-form-file v-model="file" :state="Boolean(file)" 
+                        <b-form-file v-model="file" id="file"
                             placeholder="Anexe um currículo..." required></b-form-file>
                         <div class="mt-3"><b-form-text class="font-weight-bold">Arquivo selecionado: {{file && file.name}}</b-form-text></div>
                     </b-form-group>
@@ -106,7 +106,7 @@ export default {
             modalRegCurriculum: false,
             area: null,   
             course: '',
-            file: null,
+            file: '',
             institute: '',
             graduateYear: '',
             habilities: [
@@ -131,19 +131,31 @@ export default {
             // requisição para enviá-lo ao back-end
             API.token = this.$store.getters.authToken;
 
-            // Requisição POST para adicionar um currículo            
-            API.post('/addCurriculum', {
-                area: this.area,   
-                course: this.course,
-                file: this.file,
-                institute: this.institute,
-                graduateYear: this.graduateYear,
-                habilities: this.habilities
-            }).then(function () {
+            let formData = new FormData();
+
+            formData.append('area', this.file);
+            formData.append('course', this.course);
+            formData.append('file', this.file);
+            formData.append('institute', this.institute);
+            formData.append('graduateYear', this.graduateYear);
+            formData.append('habilities', this.habilities);
+
+            // axios.post( 'http://localhost:3000/addCurriculum',
+            //     formData,
+            //     {
+            //     headers
+            //   }
+            // ).then(function(){
+            //     console.log('SUCCESS!!');
+            // })
+            // .catch(function(){
+            //     console.log('FAILURE!!');
+            // });
+            
+            // // Requisição POST para adicionar um currículo
+            API.postFile('/addCurriculum', formData).then(function () {
                 alert("Currículo cadastrado com sucesso");
                 this.$router.push('/portal-pessoa');
-            }).catch(error => {
-                this.error = error.response.data.message;
             });
         },
         showModalCurriculum () {
@@ -152,6 +164,11 @@ export default {
         hideModalCurriculum () {
             this.$refs.modalRegCurriculum.hide()
         },
+        handleFileUpload(){
+            alert('123');
+            // console.log(this.$refs.file.files[0]);
+            //this.file = this.$refs.file.files[0];
+        }
     },
     computed: {
         isValid() {
