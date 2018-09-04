@@ -83,8 +83,13 @@ export default {
             // Requisição POST para adicionar um currículo            
             API.post('/addInterests', {
                 interests: this.interests
-            }).then(function () {
-                this.$router.push('/portal-empresa');
+            }).then(reponse => {
+                // Esse log de console é utilizado para utilizar o response declarado
+                // e o warning não ocorrer na compilação 
+                console.log(response.data.code);
+                
+                // Recarrega a página
+                this.$router.go();
             }).catch(error => {
                 this.error = error.response.data.message;
             });
@@ -105,7 +110,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .badge-light {
     color: #f8ffff;
     background-color: #4a5f5d;

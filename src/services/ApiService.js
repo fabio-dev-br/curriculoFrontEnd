@@ -23,7 +23,7 @@ export default {
         return this.request('PATCH', url, qs.stringify(data));
     },
     delete(url, data) {
-        return this.request('DELETE', url, data);
+        return this.request('DELETE', url, qs.stringify(data));
     },
     request(method, url, data = {}, headers = {'Content-Type': 'application/x-www-form-urlencoded'}) {
 
@@ -32,7 +32,7 @@ export default {
         }
         return axios(API_URL + url, {
           method: method,
-          data: ,
+          data,
           headers
         });
     }

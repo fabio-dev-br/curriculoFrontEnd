@@ -131,31 +131,28 @@ export default {
             // requisição para enviá-lo ao back-end
             API.token = this.$store.getters.authToken;
 
+            // O objeto formData é instaciado apenas dentro do trecho de código ao
+            // qual ele pertence, através da instrução let
             let formData = new FormData();
 
-            formData.append('area', this.file);
+            formData.append('area', this.area);
             formData.append('course', this.course);
             formData.append('file', this.file);
             formData.append('institute', this.institute);
-            formData.append('graduateYear', this.graduateYear);
-            formData.append('habilities', this.habilities);
-
-            // axios.post( 'http://localhost:3000/addCurriculum',
-            //     formData,
-            //     {
-            //     headers
-            //   }
-            // ).then(function(){
-            //     console.log('SUCCESS!!');
-            // })
-            // .catch(function(){
-            //     console.log('FAILURE!!');
-            // });
+            formData.append('graduate_year', this.graduateYear);
+            for (var i = 0; i < this.habilities.length; i++) {
+                formData.append('habilities[]', this.habilities[i]);
+            }
             
-            // // Requisição POST para adicionar um currículo
-            API.postFile('/addCurriculum', formData).then(function () {
-                alert("Currículo cadastrado com sucesso");
-                this.$router.push('/portal-pessoa');
+            // Requisição POST para adicionar as informações do currículo
+            // e o arquivo de currículo
+            API.postFile('/addCurriculum', formData).then(response => {
+                // Esse log de console é utilizado para utilizar o response declarado
+                // e o warning não ocorrer na compilação 
+                console.log(response.data.code);
+                
+                // Recarrega a página
+                //this.$router.go();
             });
         },
         showModalCurriculum () {
@@ -163,11 +160,6 @@ export default {
         },
         hideModalCurriculum () {
             this.$refs.modalRegCurriculum.hide()
-        },
-        handleFileUpload(){
-            alert('123');
-            // console.log(this.$refs.file.files[0]);
-            //this.file = this.$refs.file.files[0];
         }
     },
     computed: {
@@ -179,7 +171,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .badge-light {
     color: #f8ffff;
     background-color: #4a5f5d;

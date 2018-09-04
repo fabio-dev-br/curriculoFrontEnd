@@ -168,7 +168,7 @@ export default {
     },
     methods: {
         // Método para intermediar a validação do formulário de empresa
-        validateCompany($event) {
+        validateCompany($event) {            
             if(this.isValid) {
                 this.user_type = 0;
                 this.sendInfo();
@@ -188,18 +188,20 @@ export default {
         // Método para enviar as informações para o cadastro
         sendInfo() {      
             // Requisição POST para cadastrar na plataforma
+              
             API.post('/newAccount', {
                 name: this.name,
                 email: this.email,
                 identity: this.identity,
                 user_type: this.user_type,
                 password: this.password
-            }).then(function () {
+            }).then(response => {
+                // Esse log de console é utilizado para utilizar o response declarado
+                // e o warning não ocorrer na compilação 
+                console.log(response.data.code);
                 // Redireciona para o login em caso de sucesso
-                alert("pipoii")
-                this.$router.push('/login');                    
+                this.$router.push('/login');                
             }).catch(error => {
-                console.log(error.response);
                 this.error = error.response.data.message;
             }); 
         },
@@ -217,9 +219,9 @@ export default {
         }
     },
     computed: {
-      isValid() {
-        // deve garantir que o formulário é valido
-        return true;  
+        isValid() {
+            // deve garantir que o formulário é valido
+            return true;  
         }
     }
 };
