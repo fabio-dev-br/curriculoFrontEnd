@@ -2,17 +2,54 @@
     <b-container>
         <!-- Seção contendo o botão de cadastro de interesses -->
         <section class="pt-2 pb-3">
-            <div class="container">
-                <div class="row text-left mt-5">
+            <b-container>
+                <b-row>
                     <b-col>
-                        <!-- Botão para abrir o modal de cadastro de interesses -->
-                        <b-button class="btn btn-lg btn-primary" @click="showModalInterests"> 
-                            Cadastro de interesses
-                        </b-button>    
+                        <b-card>
+                            <b-row>
+                                <b-col sm="1">
+                                    <icon name="search"></icon>                                    
+                                </b-col>
+                                <b-col>
+                                    <b-form-input type="search" @keyup.enter="search"
+                                    placeholder="Pesquise algo..."></b-form-input>
+                                </b-col>
+                            </b-row>
+                        </b-card>                        
                     </b-col>
-                </div>
-            </div>
+                    <b-col sm="4">
+                        <div class="mt-3">                    
+                            <b-col>
+                                <!-- Botão para abrir o modal de cadastro de interesses -->
+                                <b-button class="btn btn-lg btn-primary" @click="showModalInterests"> 
+                                    Cadastro de interesses
+                                </b-button>   
+                            </b-col>                    
+                        </div>
+                    </b-col>
+                </b-row>                                        
+            </b-container>            
         </section>
+        <!-- Seção de exibição dos interesses existentes -->
+        <section class="mb-3">
+            <div v-if="divInterests">
+                <b-card-group deck>
+                    <b-card header-tag="header">
+                        <h2 slot="header">Meus interesses</h2>
+                        <ul id="interestsList">
+                            <li v-for="interest in displayInterests">
+                                <!-- A manipulação dentro do link é para deixar a primeira
+                                letra do interesse maiúscula -->
+                                <b-link href="#">{{ interest[0].toUpperCase() + interest.slice(1) }}</b-link>
+                            </li>
+                        </ul>
+                    </b-card>
+                </b-card-group>
+                
+            </div>
+                
+        </section>
+
 
         <!-- Modal do cadastro de interesses -->
         <b-modal class="text-dark w-50 float-left"
@@ -61,7 +98,9 @@ export default {
             interests: [
                 'smart grid'                
             ],
-            error: null
+            error: null,
+            divInterests: false,
+            displayInterests: null
         }
     },
     methods: {
@@ -83,9 +122,9 @@ export default {
             // Requisição POST para adicionar um currículo            
             API.post('/addInterests', {
                 interests: this.interests
-            }).then(reponse => {
+            }).then(response => {
                 // Esse log de console é utilizado para utilizar o response declarado
-                // e o warning não ocorrer na compilação 
+                // e, assim, o warning, referente à não utilização, não ocorrer na compilação 
                 console.log(response.data.code);
                 
                 // Recarrega a página
@@ -106,11 +145,25 @@ export default {
             // Fazer a validação posteriormente
             return true;
         }
-    }
+    },
+    created: function () {
+            // O token  do usuário é recuperado e adicionado ao header da 
+            // requisição para enviá-lo ao back-end
+            API.token = this.$store.getters.authToken;
+            
+            // Requisição POST para fazer o login
+            API.get('/searchInt')
+            .then(response => {
+                this.displayInterests = response.data.data;
+                this.divInterests = true;
+            }).catch(error => {
+                this.error = error.response.data.message;
+            });
+        }
 };
 </script>
 
-<style scoped>
+<style>
 .badge-light {
     color: #f8ffff;
     background-color: #4a5f5d;

@@ -1,20 +1,45 @@
 <template>
     <b-container>
-        <!-- Seção contendo o botão de cadastro de currículo -->
+        <!-- Seção contendo o campo de pesquisa e o botão de cadastro de currículo -->
         <section class="pt-2 pb-3">
-            <div class="container">
-                <div class="row text-left mt-5">
+            <b-container>
+                <b-row>
                     <b-col>
-                        <!-- Botão para abrir o modal de cadastro de currículo -->
-                        <b-button class="btn btn-lg btn-primary" @click="showModalCurriculum"> 
-                            Cadastro de currículo
-                        </b-button>    
+                        <b-card>
+                            <b-row>
+                                <b-col sm="1">
+                                    <icon name="search"></icon>                                    
+                                </b-col>
+                                <b-col>
+                                    <b-form-input type="search" @keyup.enter="search"
+                                        placeholder="Pesquise algo..."></b-form-input>
+                                </b-col>
+                            </b-row>
+                        </b-card>                        
                     </b-col>
-                </div>
-            </div>
+                    <b-col md="2">
+                        <div class="mt-3">                    
+                            <b-col>
+                                <!-- Botão para abrir o modal de cadastro de currículo -->
+                                <b-button class="btn btn-lg btn-primary" @click="showModalCurriculum"> 
+                                    Cadastro de currículo
+                                </b-button>    
+                            </b-col>                    
+                        </div>
+                    </b-col>
+                </b-row>                                        
+            </b-container>            
         </section>
+        <section>
+                <b-container>
+                    <h1 v-if="ifResults">
+                        Resultados
+                    </h1>
+                </b-container>
+        </section>
+        
 
-        <!-- Modal do cadastro de empresas -->
+        <!-- Modal de cadastro de currículo -->
         <b-modal class="text-dark w-50 float-left"
             hide-footer
             centered
@@ -112,7 +137,9 @@ export default {
             habilities: [
                 'smart grid'                
             ],
-            error: null
+            error: null,
+            ifResults: false,
+            results: null
         }
     },
     methods: {
@@ -148,7 +175,7 @@ export default {
             // e o arquivo de currículo
             API.postFile('/addCurriculum', formData).then(response => {
                 // Esse log de console é utilizado para utilizar o response declarado
-                // e o warning não ocorrer na compilação 
+                // e, assim, o warning, referente à não utilização, não ocorrer na compilação 
                 console.log(response.data.code);
                 
                 // Recarrega a página
@@ -171,7 +198,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .badge-light {
     color: #f8ffff;
     background-color: #4a5f5d;
