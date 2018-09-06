@@ -128,17 +128,25 @@ export default {
     name: "portalPessoa",
     data() {
         return {
+            // Variável para controlar a exibição do modal
             modalRegCurriculum: false,
             area: null,   
             course: '',
             file: '',
             institute: '',
             graduateYear: '',
+            // Variável para a adição de habilidades
             habilities: [
                 'smart grid'                
             ],
+            // Variável que recebe o erro do back caso
+            // haja algum erro na adição do currículo
             error: null,
+            // Variável que controla a exibição da 
+            // div de resultados da busca
             ifResults: false,
+            // Variável que recebe os resultados 
+            // da pesquisa
             results: null
         }
     },
@@ -182,9 +190,11 @@ export default {
                 //this.$router.go();
             });
         },
+        // Método que mostra o modal para adicionar currículos
         showModalCurriculum () {
             this.$refs.modalRegCurriculum.show()
         },
+        // Método para esconder o modal de adicionar currículos
         hideModalCurriculum () {
             this.$refs.modalRegCurriculum.hide()
         }

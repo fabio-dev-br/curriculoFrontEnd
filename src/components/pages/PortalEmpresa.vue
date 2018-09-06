@@ -12,44 +12,14 @@
                                 </b-col>
                                 <b-col>
                                     <b-form-input type="search" @keyup.enter="search"
-                                    placeholder="Pesquise algo..."></b-form-input>
+                                        placeholder="Pesquise algo..."></b-form-input>
                                 </b-col>
                             </b-row>
                         </b-card>                        
-                    </b-col>
-                    <b-col sm="4">
-                        <div class="mt-3">                    
-                            <b-col>
-                                <!-- Botão para abrir o modal de cadastro de interesses -->
-                                <b-button class="btn btn-lg btn-primary" @click="showModalInterests"> 
-                                    Cadastro de interesses
-                                </b-button>   
-                            </b-col>                    
-                        </div>
-                    </b-col>
+                    </b-col>                    
                 </b-row>                                        
             </b-container>            
         </section>
-        <!-- Seção de exibição dos interesses existentes -->
-        <section class="mb-3">
-            <div v-if="divInterests">
-                <b-card-group deck>
-                    <b-card header-tag="header">
-                        <h2 slot="header">Meus interesses</h2>
-                        <ul id="interestsList">
-                            <li v-for="interest in displayInterests">
-                                <!-- A manipulação dentro do link é para deixar a primeira
-                                letra do interesse maiúscula -->
-                                <b-link href="#">{{ interest[0].toUpperCase() + interest.slice(1) }}</b-link>
-                            </li>
-                        </ul>
-                    </b-card>
-                </b-card-group>
-                
-            </div>
-                
-        </section>
-
 
         <!-- Modal do cadastro de interesses -->
         <b-modal class="text-dark w-50 float-left"
@@ -70,7 +40,6 @@
                         <tags-input input-class="form-control"
                             element-id="interestsTags"
                             v-model="interests"
-                            :limit = 3
                             placeholder="Digite um interesse"></tags-input> 
                     </b-form-group>
 
@@ -82,6 +51,118 @@
                 </b-form>
             </div>
         </b-modal>
+
+        <!-- Seção de exibição dos interesses existentes -->
+        <section class="mb-3">
+            <div v-if="divInterests">
+                <b-card-group deck>
+                    <b-card header-tag="header">
+                        <b-row slot="header">
+                            <b-col>
+                                <h2 slot="header">Meus interesses</h2>
+                            </b-col>
+                            <b-col sm="2" v-if="!alterToRemoveInterests">
+                                <b-row>
+                                    <b-col class="mt-2">
+                                        <!-- Botão para abrir o modal de cadastro de interesses -->
+                                        <b-button class="btn btn-sm bg-warning border-warning" @click="showModalInterests"> 
+                                            <icon name="plus"></icon>
+                                        </b-button>           
+                                    </b-col>
+                                    <b-col class="mt-2">
+                                        <!-- Botão para preparar para a remoção de interesses -->
+                                        <b-button class="btn btn-sm bg-warning border-warning" @click="prepareRemove"> 
+                                            <icon name="minus"></icon>
+                                        </b-button>
+                                    </b-col>                                    
+                                </b-row>                                
+                            </b-col>
+                        </b-row>                                                
+                        <ul id="interestsList">
+                            <!-- Template que é mostrado inicialmente no carregamento da página
+                            e redireciona para uma pesquisa dos currículos relacionados ao interesse 
+                            em questão                             -->
+                            <template v-if="showInterests">
+                                <li v-for="interest in displayInterests" :key="interest.id">
+                                    <!-- A manipulação dentro do link é para deixar a primeira
+                                    letra do interesse maiúscula -->
+                                    <b-link @click.prevent="search(interest.value)">
+                                        {{ interest.text[0].toUpperCase() + interest.text.slice(1) }}
+                                    </b-link>
+                                </li>                                
+                            </template>
+
+                            <!-- Template que prepara a interface para a remoção de interesses, é acionado pelo botão com ícone minus -->
+                            <template v-else>
+                                <b-form-group >
+                                    <div><strong>Selecione os interesses que deseja deletar: </strong></div>                                    
+                                    
+                                    <!-- Checkbox-group pega o vetor já preparado (text e value), quando os interesses são recuperados
+                                    do back-end, e mostra -->
+                                    <b-form-checkbox-group id="interestsSelected" name="interests"
+                                        v-model="selected" 
+                                        :options="displayInterests" stacked>
+                                    </b-form-checkbox-group>                                    
+                                </b-form-group>                                
+                            </template>                            
+                        </ul>
+                        <div slot="footer" v-if="alterToRemoveInterests">
+                            <b-row align-h="end" class="mr-2">
+                                <!-- Botão para cancelar a remoção dos interesses -->
+                                <b-button class="btn btn-sm btn-danger text-light" @click="prepareRemove"> 
+                                    Cancelar
+                                </b-button>
+
+                                <!-- Pequena distância entre os dois botões -->
+                                <div class="mr-1"></div>
+
+                                <!-- Botão para confirmar a remoção dos interesses -->
+                                <b-button class="btn btn-sm btn-warning text-light" @click="removeInterests"> 
+                                    Confirmar
+                                </b-button>        
+                            </b-row>                            
+                        </div>
+                    </b-card>
+                </b-card-group>                
+            </div>                
+        </section>
+
+        <!-- Seção de exibição do resultado da busca -->
+        <section class="mb-3">
+            <div v-if="divSearch">
+                <b-card-group deck>
+                    <b-card header-tag="header">
+                        <b-row slot="header">
+                            <b-col>
+                                <h2 slot="header">Resultados - {{ headerSearch }} </h2>
+                            </b-col>
+                            <b-row align-h="end" class="mr-2">
+                                <!-- Botão para fechar a seção de busca -->
+                                <b-button class="btn btn-sm btn-danger text-light" @click="hideSearchSection"> 
+                                    <icon name="window-close"></icon>
+                                </b-button>       
+                            </b-row> 
+                        </b-row>                                                
+                        <ul id="searchList">                            
+                            <template v-if="showCurricula">
+                                <li v-for="curriculum in curricula" :key="curriculum.id">
+                                    
+
+                                </li>                                
+                            </template>
+
+                            <!-- Template para exibir que não existem resultados -->
+                            <template v-else>                                
+                                <div><strong>Não existem currículos com a habilidade desejada</strong></div>                                                                                                        
+                            </template>                            
+                        </ul>
+                        <div slot="footer" v-if="alterToRemoveInterests">
+                                                       
+                        </div>
+                    </b-card>
+                </b-card-group>                
+            </div>                
+        </section>
     </b-container>
 </template>
 
@@ -94,13 +175,56 @@ export default {
     name: "portalEmpresa",
     data() {
         return {
+            // Variável para controlar a exibição do modal
             modalRegInterests: false,
+
+            // Variável para a adição de interesses
             interests: [
                 'smart grid'                
             ],
-            error: null,
+
+            // Variável que recebe o erro do back caso
+            // haja algum erro na adição de interesses
+            errorAddInterest: null,
+
+            // Variável para controlar a exibição da div de 
+            // interesses
             divInterests: false,
-            displayInterests: null
+
+            // Variável que recebe os interesses existentes 
+            // da empresa, para visualização
+            displayInterests: null,
+
+            // Variável para controlar a exibição do botão de 
+            // remover existente no footer
+            alterToRemoveInterests: false,
+
+            // Variável para alternar a exibição da página entre
+            // os interesses existentes e a interface de remoção deles
+            showInterests: true,
+
+            // Variável que recebe o erro do back caso
+            // haja algum erro na remoção de interesses
+            errorRemoveInterest: null,
+
+            // Variável contendo os interesses selecionados
+            selected: [],
+
+            // Váriável para exibir a div de resultados da busca
+            divSearch: false,
+
+            // Variável para exibir os currículos encontrados
+            showCurricula: false,
+
+            // Cabeçalho dos resultados
+            headerSearch: null,
+
+            // Currículos encontrados
+            curricula: null,
+
+            // Variável que recebe o erro do back caso
+            // haja algum erro na busca de interesses
+            errorSearchInterest: null,
         }
     },
     methods: {
@@ -113,13 +237,14 @@ export default {
             // Previne o recarregamento da página (ou seja, que o evento de submit aconteça)
             $event.preventDefault();
         },
+
         // Método para adicionar interesses
         addInterests() {
             // O token  do usuário é recuperado e adicionado ao header da 
             // requisição para enviá-lo ao back-end
             API.token = this.$store.getters.authToken;
 
-            // Requisição POST para adicionar um currículo            
+            // Requisição POST para adicionar interesses           
             API.post('/addInterests', {
                 interests: this.interests
             }).then(response => {
@@ -130,15 +255,65 @@ export default {
                 // Recarrega a página
                 this.$router.go();
             }).catch(error => {
-                this.error = error.response.data.message;
+                this.errorAddInterest = error.response.data.message;
             });
         },
+
+        // Método que mostra o modal para adicionar interesses
         showModalInterests () {
             this.$refs.modalRegInterests.show()
         },
+
+        // Método que esconde o modal para adicionar interesses
         hideModalInterests () {
             this.$refs.modalRegInterests.hide()
         },
+
+        // Método que prepara a página para a remoção de interesses
+        prepareRemove () {
+            this.showInterests = !this.showInterests;
+            this.alterToRemoveInterests = !this.alterToRemoveInterests;            
+        },
+
+        // Método que remove os interesses selecionados
+        removeInterests () {
+            // Requisição POST para adicionar um currículo            
+            API.post('/deleteInterests', {
+                interests: this.selected
+            }).then(response => {
+                // Esse log de console é utilizado para utilizar o response declarado
+                // e, assim, o warning, referente à não utilização, não ocorrer na compilação 
+                console.log(response.data.code);
+                
+                // Recarrega a página
+                this.$router.go();
+            }).catch(error => {
+                this.errorRemoveInterest = error.response.data.message;
+            });
+        },
+
+        // Método que busca os currículos relacionados com 
+        // o interesse selecionado através do link
+        search (value) {
+            // Requisição GET para buscar currículos relacionados ao interesse dado
+            API.get('/searchCurByInt', {
+                interests: value
+            }).then(response => {
+                // Esse log de console é utilizado para utilizar o response declarado
+                // e, assim, o warning, referente à não utilização, não ocorrer na compilação 
+                console.log(response.data.code);
+                // Variável currícula recebe os resultados da pesquisa no back-end
+                this.curricula = response.data.data.curricula;                
+            }).catch(error => {
+                this.errorSearchInterest = error.response.data.message;
+            });
+            this.divSearch = !this.divSearch;
+        },
+
+        // Método para esconder a seção de resultados da busca
+        hideSearchSection () {
+            this.divSearch = !this.divSearch;
+        }
     },
     computed: {
         isValid() {
@@ -147,26 +322,35 @@ export default {
         }
     },
     created: function () {
-            // O token  do usuário é recuperado e adicionado ao header da 
-            // requisição para enviá-lo ao back-end
-            API.token = this.$store.getters.authToken;
-            
-            // Requisição POST para fazer o login
-            API.get('/searchInt')
-            .then(response => {
-                this.displayInterests = response.data.data;
-                this.divInterests = true;
-            }).catch(error => {
-                this.error = error.response.data.message;
-            });
-        }
+        // O token  do usuário é recuperado e adicionado ao header da 
+        // requisição para enviá-lo ao back-end
+        API.token = this.$store.getters.authToken;
+        
+        // Requisição POST para fazer o login
+        API.get('/searchInt')
+        .then(response => {
+            // auxInterests é um vetor que auxilia na organização dos dados
+            // , provenientes do back-end, de maneira que na parte de remoção 
+            // o check-box-group é montado automaticamente (text e value)
+            var auxInterests = [];            
+            response.data.data.forEach(element => {                
+                auxInterests = auxInterests.concat(
+                    {text: element, value: element}
+                );
+                this.displayInterests = auxInterests;
+            });            
+            this.divInterests = true;
+        }).catch(error => {
+            this.error = error.response.data.message;
+        });
+    }
 };
 </script>
 
 <style>
 .badge-light {
-    color: #f8ffff;
-    background-color: #4a5f5d;
+    color: #ffffff;
+    background-color: #ffc107;
 }
 
 .tags-input-remove:before, .tags-input-remove:after {
@@ -175,7 +359,7 @@ export default {
     width: 100%;
     top: 50%;
     left: 0;
-    background: #eaee20;
+    background: #000000;
     height: 2px;
     margin-top: -1px;
 }
