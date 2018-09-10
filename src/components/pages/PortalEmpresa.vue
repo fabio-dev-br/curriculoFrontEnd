@@ -142,20 +142,64 @@
                                     <icon name="window-close"></icon>
                                 </b-button>       
                             </b-row> 
-                        </b-row>                                                
-                        <ul id="searchList">                            
+                        </b-row> 
+                        <!-- Template contendo as possibilidades de resultados -->                                               
+                        <template id="searchList">                            
+
+                            <!-- Template para mostrar os currículos existentes -->
                             <template v-if="showCurricula">
-                                <li v-for="curriculum in curricula" :key="curriculum.id">
-                                    
+                                <!-- Card para cada currículo contendo área, instituição, curso, ano de formação, link para download do
+                                currículo e data da última atualização-->
+                                <b-card                                
+                                    v-for="curriculum in curricula" 
+                                    :title="curriculum.name"
+                                    :key="curriculum.id"
+                                    class="mb-4">
+                                    <ul>
+                                        <!-- Área -->
+                                        <li>
+                                            <p class="card-text"><Strong>Área: </Strong> {{ curriculum.area }}</p>
+                                        </li>
 
-                                </li>                                
-                            </template>
+                                        <!-- Instituição -->
+                                        <li>
+                                            <p class="card-text"><Strong>Instituição: </Strong> {{ curriculum.institute }}</p>
+                                        </li>
 
-                            <!-- Template para exibir que não existem resultados -->
-                            <template v-else>                                
-                                <div><strong>Não existem currículos com a habilidade desejada</strong></div>                                                                                                        
+                                        <!-- Curso -->
+                                        <li>
+                                            <p class="card-text"><Strong>Curso: </Strong> {{ curriculum.course }}</p>
+                                        </li>
+
+                                        <!-- Ano de formação -->
+                                        <li>
+                                            <p class="card-text"><Strong>Ano de formação: </Strong> {{ curriculum.graduate_year }}</p>
+                                        </li>
+
+                                        <!-- Link para baixar currículo e data da última atualização -->
+                                        <li>
+                                            <p class="card-text">
+                                                <Strong>
+                                                    Arquivo de currículo:                                                     
+                                                </Strong> 
+                                                <b-link @click.prevent="getFile(curriculum.hash_file)">
+                                                    Baixar
+                                                </b-link>
+                                                <small class="text-muted">
+                                                    - Última atualização: {{ curriculum.reg_up }}
+                                                </small>                                                
+                                            </p>
+                                        </li>
+                                    </ul>                                    
+                                </b-card>
                             </template>                            
-                        </ul>
+
+                            <!-- Template para informar que não existem resultados -->                            
+                            <template v-else>
+                                    <div><strong>Não existem currículos com a habilidade desejada</strong></div> 
+                            </template>
+                            
+                        </template>
                         <div slot="footer" v-if="alterToRemoveInterests">
                                                        
                         </div>
@@ -170,6 +214,7 @@
 
 // Imports necessários para fazer a requisição ao servidor
 import API from '../../services/ApiService';
+import axios from 'axios';
 
 export default {
     name: "portalEmpresa",
@@ -295,24 +340,58 @@ export default {
         // Método que busca os currículos relacionados com 
         // o interesse selecionado através do link
         search (value) {
+            // Muda o valor de headerSearch para o interesse procurado
+            this.headerSearch = value;
+
             // Requisição GET para buscar currículos relacionados ao interesse dado
-            API.get('/searchCurByInt', {
-                interests: value
-            }).then(response => {
-                // Esse log de console é utilizado para utilizar o response declarado
-                // e, assim, o warning, referente à não utilização, não ocorrer na compilação 
-                console.log(response.data.code);
-                // Variável currícula recebe os resultados da pesquisa no back-end
-                this.curricula = response.data.data.curricula;                
-            }).catch(error => {
-                this.errorSearchInterest = error.response.data.message;
-            });
-            this.divSearch = !this.divSearch;
+            axios.get('http://localhost:3000/searchCurByInt', {
+                params: {
+                    interests: value
+                }                
+            },
+            {'Content-Type': 'application/x-www-form-urlencoded'},)
+            .then(response => {
+                this.curricula = response.data.data[value];
+                
+                // Verifica se existe algum currículo relacionado à habilidade passada,
+                // se existe algum, no elemento searchList será mostrado todos os resultados, caso 
+                // contrário, é mostrado uma mensagem de que não há resultados
+                if(!this.curricula) {
+                    this.showCurricula = false;
+                } else {
+                    this.showCurricula = true;                    
+                }
+
+            }); 
+
+            // API.get('/searchCurByInt', {
+            //     params: {
+            //         interests: value
+            //     }
+            // }).then(response => {
+            //     // Esse log de console é utilizado para utilizar o response declarado
+            //     // e, assim, o warning, referente à não utilização, não ocorrer na compilação 
+            //     console.log(response.data.code);
+                
+            //     // Variável currícula recebe os resultados da pesquisa no back-end
+            //     console.log(response.data.data);
+            //     // this.curricula = response.data.data.curricula;   
+                            
+            // }).catch(error => {
+            //     this.errorSearchInterest = error.response.data.message;
+            // });
+            
+            this.divSearch = true; 
         },
 
         // Método para esconder a seção de resultados da busca
         hideSearchSection () {
             this.divSearch = !this.divSearch;
+        },
+
+        // Método para baixar o arquivo de currículo do servidor
+        getFile(hash_file) {
+            console.log(hash_file);
         }
     },
     computed: {

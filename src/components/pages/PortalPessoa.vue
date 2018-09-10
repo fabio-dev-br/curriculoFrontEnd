@@ -130,21 +130,35 @@ export default {
         return {
             // Variável para controlar a exibição do modal
             modalRegCurriculum: false,
+
+            // Variável para a área de atuação (exatas, biológicas ou humanas)
             area: null,   
+
+            // Variável para o curso 
             course: '',
+
+            // Variável para o arquivo de currículo
             file: '',
+
+            // Variável para o instituto de formação
             institute: '',
+
+            // Variável para o ano de formação
             graduateYear: '',
+
             // Variável para a adição de habilidades
             habilities: [
                 'smart grid'                
             ],
+
             // Variável que recebe o erro do back caso
             // haja algum erro na adição do currículo
             error: null,
+
             // Variável que controla a exibição da 
             // div de resultados da busca
             ifResults: false,
+            
             // Variável que recebe os resultados 
             // da pesquisa
             results: null
