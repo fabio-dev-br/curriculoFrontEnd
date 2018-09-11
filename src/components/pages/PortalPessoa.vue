@@ -1,35 +1,72 @@
 <template>
     <b-container>
+        
         <!-- Seção contendo o campo de pesquisa e o botão de cadastro de currículo -->
         <section class="pt-2 pb-3">
             <b-container>
-                <b-row>
-                    <b-col>
-                        <b-card>
-                            <b-row>
-                                <b-col sm="1">
-                                    <icon name="search"></icon>                                    
-                                </b-col>
-                                <b-col>
-                                    <b-form-input type="search" @keyup.enter="search"
-                                        placeholder="Pesquise algo..."></b-form-input>
-                                </b-col>
-                            </b-row>
-                        </b-card>                        
-                    </b-col>
-                    <b-col md="2">
-                        <div class="mt-3">                    
-                            <b-col>
-                                <!-- Botão para abrir o modal de cadastro de currículo -->
-                                <b-button class="btn btn-lg btn-primary" @click="showModalCurriculum"> 
-                                    Cadastro de currículo
-                                </b-button>    
-                            </b-col>                    
-                        </div>
-                    </b-col>
-                </b-row>                                        
+                <b-card>
+                    <b-row>
+                        <b-col sm="1">
+                            <icon name="search"></icon>                                    
+                        </b-col>
+                        <b-col>
+                            <b-form-input type="search" @keyup.enter="search"
+                                placeholder="Pesquise algo..."></b-form-input>
+                        </b-col>
+                    </b-row>
+                </b-card>                                                                           
             </b-container>            
         </section>
+
+        <!-- Seção de currículo -->
+        <section>
+            <div class="mt-3 mb-3">                    
+                <b-card-group deck>
+                    <b-card header-tag="header">
+                        <b-container slot="header">
+                            <b-row align-h="start">
+                                <b-col>
+                                    <h2 slot="header">Meu currículo</h2>
+                                </b-col>
+                                                            
+                                <!-- Botão para abrir o modal de cadastro de currículo -->
+                                <b-button class="btn btn-sm bg-warning border-warning mr-3"                                     
+                                    @click="showModalCurriculum"> 
+                                    <icon name="plus"></icon>
+                                </b-button>                                           
+                            </b-row>
+                        </b-container>                                                
+                        
+                        <!-- Template que é mostrado inicialmente no carregamento da página -->
+                        <template v-if="showCurriculum">
+                            <li v-for="interest in displayInterests" :key="interest.id">
+                                <!-- A manipulação dentro do link é para deixar a primeira
+                                letra do interesse maiúscula -->
+                                <b-link @click.prevent="search(interest.value)">
+                                    {{ interest.text[0].toUpperCase() + interest.text.slice(1) }}
+                                </b-link>
+                            </li>                                
+                        </template>
+
+                        <!-- Template que prepara a interface para a remoção de interesses, é acionado pelo botão com ícone minus -->
+                        <template v-else>
+                            <b-form-group >
+                                <div><strong>Selecione os interesses que deseja deletar: </strong></div>                                    
+                                
+                                <!-- Checkbox-group pega o vetor já preparado (text e value), quando os interesses são recuperados
+                                do back-end, e mostra -->
+                                <b-form-checkbox-group id="interestsSelected" name="interests"
+                                    v-model="selected" 
+                                    :options="displayInterests" stacked>
+                                </b-form-checkbox-group>                                    
+                            </b-form-group>                                
+                        </template>                                       
+                    </b-card>
+                </b-card-group>                   
+            </div> 
+        </section>
+
+        <!-- Seção de exibição de resultados -->
         <section>
                 <b-container>
                     <h1 v-if="ifResults">
@@ -161,7 +198,16 @@ export default {
             
             // Variável que recebe os resultados 
             // da pesquisa
-            results: null
+            results: null,
+
+            // Variável para exibir o botão de adição de currículo
+            alreadyAddCurriculum: false,
+
+            // Variável para exibir o currículo do usuário
+            showCurriculum: false,
+
+            // Variável para receber e exibir as informações do currículo
+            curriculum: null,
         }
     },
     methods: {
@@ -201,7 +247,7 @@ export default {
                 console.log(response.data.code);
                 
                 // Recarrega a página
-                //this.$router.go();
+                this.$router.go();
             });
         },
         // Método que mostra o modal para adicionar currículos
@@ -218,6 +264,20 @@ export default {
             // Fazer a validação posteriormente
             return true;
         }
+    },
+    // Função para recuperar as informações do currículo no back-end
+    created: function () {
+        // O token  do usuário é recuperado e adicionado ao header da 
+        // requisição para enviá-lo ao back-end
+        API.token = this.$store.getters.authToken;
+        
+        // Requisição POST para recuperar o currículo
+        API.get('/getCurriculum')
+        .then(response => {                        
+            this.curriculum = response.data.data;
+        }).catch(error => {
+            this.error = error.response.data.message;
+        });
     }
 };
 </script>

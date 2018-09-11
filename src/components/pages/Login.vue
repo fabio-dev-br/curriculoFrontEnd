@@ -11,7 +11,7 @@
                             <b-form @submit="validate">
                                 <!-- E-mail -->
                                 <b-form-group>                                    
-                                    <b-form-text for="userEmail"><icon name="envelope"></icon> Seu e-mail</b-form-text>
+                                    <b-form-text class="mb-2" for="userEmail"><icon name="envelope"></icon> Seu e-mail</b-form-text>
                                     <b-form-input type="email"
                                         id="userEmail"  
                                         v-model="email"
@@ -20,7 +20,7 @@
                                 
                                 <!-- Senha -->
                                 <b-form-group>
-                                    <b-form-text for="userPassword"><icon name="lock"></icon> Sua senha</b-form-text>
+                                    <b-form-text class="mb-2" for="userPassword"><icon name="lock"></icon> Sua senha</b-form-text>
                                     <b-form-input type="password"
                                         id="userPassword" 
                                         v-model="password"

@@ -3,21 +3,17 @@
         <!-- Seção contendo o botão de cadastro de interesses -->
         <section class="pt-2 pb-3">
             <b-container>
-                <b-row>
-                    <b-col>
-                        <b-card>
-                            <b-row>
-                                <b-col sm="1">
-                                    <icon name="search"></icon>                                    
-                                </b-col>
-                                <b-col>
-                                    <b-form-input type="search" @keyup.enter="search"
-                                        placeholder="Pesquise algo..."></b-form-input>
-                                </b-col>
-                            </b-row>
-                        </b-card>                        
-                    </b-col>                    
-                </b-row>                                        
+                <b-card>
+                    <b-row>
+                        <b-col sm="1">
+                            <icon name="search"></icon>                                    
+                        </b-col>
+                        <b-col>
+                            <b-form-input type="search" @keyup.enter="search"
+                                placeholder="Pesquise algo..."></b-form-input>
+                        </b-col>
+                    </b-row>
+                </b-card>                                                               
             </b-container>            
         </section>
 
@@ -57,27 +53,24 @@
             <div v-if="divInterests">
                 <b-card-group deck>
                     <b-card header-tag="header">
-                        <b-row slot="header">
-                            <b-col>
-                                <h2 slot="header">Meus interesses</h2>
-                            </b-col>
-                            <b-col sm="2" v-if="!alterToRemoveInterests">
-                                <b-row>
-                                    <b-col class="mt-2">
-                                        <!-- Botão para abrir o modal de cadastro de interesses -->
-                                        <b-button class="btn btn-sm bg-warning border-warning" @click="showModalInterests"> 
-                                            <icon name="plus"></icon>
-                                        </b-button>           
-                                    </b-col>
-                                    <b-col class="mt-2">
-                                        <!-- Botão para preparar para a remoção de interesses -->
-                                        <b-button class="btn btn-sm bg-warning border-warning" @click="prepareRemove"> 
-                                            <icon name="minus"></icon>
-                                        </b-button>
-                                    </b-col>                                    
-                                </b-row>                                
-                            </b-col>
-                        </b-row>                                                
+                        <b-container slot="header">
+                            <b-row align-h="start">
+                                <b-col>
+                                    <h2 slot="header">Meus interesses</h2>
+                                </b-col>                                                            
+                                <template class="mt-2" v-if="!alterToRemoveInterests">
+                                    <!-- Botão para abrir o modal de cadastro de interesses -->
+                                    <b-button class="btn btn-sm bg-warning border-warning mr-3" @click="showModalInterests"> 
+                                        <icon name="plus"></icon>
+                                    </b-button>           
+                                
+                                    <!-- Botão para preparar para a remoção de interesses -->
+                                    <b-button class="btn btn-sm bg-warning border-warning" @click="prepareRemove"> 
+                                        <icon name="minus"></icon>
+                                    </b-button>
+                                </template>                                      
+                            </b-row>
+                        </b-container>                                                
                         <ul id="interestsList">
                             <!-- Template que é mostrado inicialmente no carregamento da página
                             e redireciona para uma pesquisa dos currículos relacionados ao interesse 
@@ -152,9 +145,10 @@
                                 currículo e data da última atualização-->
                                 <b-card                                
                                     v-for="curriculum in curricula" 
-                                    :title="curriculum.name"
+                                    
                                     :key="curriculum.id"
                                     class="mb-4">
+                                    <h4 class="pl-2 header-gradient"> {{ curriculum.name }} </h4>
                                     <ul>
                                         <!-- Área -->
                                         <li>
@@ -176,13 +170,13 @@
                                             <p class="card-text"><Strong>Ano de formação: </Strong> {{ curriculum.graduate_year }}</p>
                                         </li>
 
-                                        <!-- Link para baixar currículo e data da última atualização -->
+                                        <!-- Link para baixar currículo junto com a data da última atualização -->
                                         <li>
                                             <p class="card-text">
                                                 <Strong>
                                                     Arquivo de currículo:                                                     
                                                 </Strong> 
-                                                <b-link @click.prevent="getFile(curriculum.hash_file)">
+                                                <b-link :href="('http://localhost:3000/public/curriculos/').concat(curriculum.hash_file)" download="algo.txt">
                                                     Baixar
                                                 </b-link>
                                                 <small class="text-muted">
@@ -190,13 +184,22 @@
                                                 </small>                                                
                                             </p>
                                         </li>
+
+                                        <!-- Habilidades -->
+                                        <li>
+                                            <Strong>Habilidades: </Strong>
+                                            <span class="border pl-1 mr-2 text-dark"
+                                                v-for="hability in curriculum.habilities">
+                                                {{ hability }}
+                                            </span>
+                                        </li>
                                     </ul>                                    
                                 </b-card>
                             </template>                            
 
                             <!-- Template para informar que não existem resultados -->                            
                             <template v-else>
-                                    <div><strong>Não existem currículos com a habilidade desejada</strong></div> 
+                                <div><strong>Não existem currículos com a habilidade desejada</strong></div> 
                             </template>
                             
                         </template>
@@ -389,10 +392,22 @@ export default {
             this.divSearch = !this.divSearch;
         },
 
-        // Método para baixar o arquivo de currículo do servidor
-        getFile(hash_file) {
-            console.log(hash_file);
-        }
+        // // Método para baixar o arquivo de currículo do servidor
+        // getFile(hash_file) {
+        //     var $filePath = ('http://localhost:3000/public/curriculos/').concat(hash_file);
+        //     console.log($filePath);
+        //     // Requisição GET para buscar currículos relacionados ao interesse dado
+        //     axios.get($filePath, {
+        //         params: {
+        //             hash_file: hash_file
+        //         }                
+        //     },
+        //     {'Content-Type': 'application/x-www-form-urlencoded'},)
+        //     .then(response => {
+
+            
+        //     }); 
+        // }
     },
     computed: {
         isValid() {
@@ -400,6 +415,7 @@ export default {
             return true;
         }
     },
+    // Função para recuperar os interesses da empresa presentes no back-end
     created: function () {
         // O token  do usuário é recuperado e adicionado ao header da 
         // requisição para enviá-lo ao back-end
@@ -441,5 +457,15 @@ export default {
     background: #000000;
     height: 2px;
     margin-top: -1px;
+}
+
+.border {
+    border-radius: 8px;
+    background: #a3abb3;
+}
+
+.header-gradient{
+    border-radius: 4px;
+    background: linear-gradient(to right, #a3abb3 20%, #ffffff  80%);
 }
 </style>
