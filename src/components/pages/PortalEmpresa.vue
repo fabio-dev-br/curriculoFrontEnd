@@ -17,37 +17,6 @@
             </b-container>            
         </section>
 
-        <!-- Modal do cadastro de interesses -->
-        <b-modal class="text-dark w-50 float-left"
-            hide-footer
-            centered
-            title="Cadastro de Interesses"
-            size="lg"
-            ref="modalRegInterests">    
-                    
-            <!-- Modal body -->
-            <div class="modal-body">
-                <!-- Formulário de interesses, contém: interesses -->
-                <b-form id="interestsForm" @submit="validateInterests">
-
-                    <!-- Habilidades / Foi colocado um limite de 3 habilidades -->
-                    <b-form-group description="Digite os interesses" label-size="lg">
-                        <b-form-text for="interestsTags"> Interesses </b-form-text>
-                        <tags-input input-class="form-control"
-                            element-id="interestsTags"
-                            v-model="interests"
-                            placeholder="Digite um interesse"></tags-input> 
-                    </b-form-group>
-
-                    <!-- Modal footer -->
-                    <div class="modal-footer">
-                        <b-btn variant="outline-danger" @click="hideModalInterests">Fechar</b-btn>
-                        <b-btn variant="outline-success" type="submit">Enviar</b-btn>
-                    </div>  
-                </b-form>
-            </div>
-        </b-modal>
-
         <!-- Seção de exibição dos interesses existentes -->
         <section class="mb-3">
             <div v-if="divInterests">
@@ -102,12 +71,9 @@
                         <div slot="footer" v-if="alterToRemoveInterests">
                             <b-row align-h="end" class="mr-2">
                                 <!-- Botão para cancelar a remoção dos interesses -->
-                                <b-button class="btn btn-sm btn-danger text-light" @click="prepareRemove"> 
+                                <b-button class="btn btn-sm btn-danger text-light mr-1" @click="prepareRemove"> 
                                     Cancelar
                                 </b-button>
-
-                                <!-- Pequena distância entre os dois botões -->
-                                <div class="mr-1"></div>
 
                                 <!-- Botão para confirmar a remoção dos interesses -->
                                 <b-button class="btn btn-sm btn-warning text-light" @click="removeInterests"> 
@@ -120,6 +86,38 @@
             </div>                
         </section>
 
+        <!-- Modal do cadastro de interesses -->
+        <b-modal class="text-dark w-50 float-left"
+            hide-footer
+            centered
+            title="Cadastro de Interesses"
+            size="lg"
+            ref="modalRegInterests">    
+                    
+            <!-- Modal body -->
+            <div class="modal-body">
+                <!-- Formulário de interesses, contém: interesses -->
+                <b-form id="interestsForm" @submit="validateInterests">
+
+                    <!-- Habilidades / Foi colocado um limite de 3 habilidades -->
+                    <b-form-group description="Digite os interesses" label-size="lg">
+                        <b-form-text for="interestsTags"> Interesses </b-form-text>
+                        <tags-input 
+                            input-class="form-control"
+                            element-id="interestsTags"
+                            v-model="interests"
+                            placeholder="Digite um interesse"></tags-input> 
+                    </b-form-group>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <b-btn variant="outline-danger" @click="hideModalInterests">Fechar</b-btn>
+                        <b-btn variant="outline-success" type="submit">Enviar</b-btn>
+                    </div>  
+                </b-form>
+            </div>
+        </b-modal>        
+
         <!-- Seção de exibição do resultado da busca -->
         <section class="mb-3">
             <div v-if="divSearch">
@@ -131,7 +129,8 @@
                             </b-col>
                             <b-row align-h="end" class="mr-2">
                                 <!-- Botão para fechar a seção de busca -->
-                                <b-button class="btn btn-sm btn-danger text-light" @click="hideSearchSection"> 
+                                <b-button class="btn btn-sm btn-danger text-light" 
+                                    @click="hideSearchSection"> 
                                     <icon name="window-close"></icon>
                                 </b-button>       
                             </b-row> 
@@ -144,8 +143,7 @@
                                 <!-- Card para cada currículo contendo área, instituição, curso, ano de formação, link para download do
                                 currículo e data da última atualização-->
                                 <b-card                                
-                                    v-for="curriculum in curricula" 
-                                    
+                                    v-for="curriculum in curricula"                                     
                                     :key="curriculum.id"
                                     class="mb-4">
                                     <h4 class="pl-2 header-gradient"> {{ curriculum.name }} </h4>
@@ -176,7 +174,7 @@
                                                 <Strong>
                                                     Arquivo de currículo:                                                     
                                                 </Strong> 
-                                                <b-link :href="('http://localhost:3000/public/curriculos/').concat(curriculum.hash_file)" download="algo.txt">
+                                                <b-link :href="'http://localhost:3000/curriculos/' + curriculum.hash_file">
                                                     Baixar
                                                 </b-link>
                                                 <small class="text-muted">
@@ -188,7 +186,7 @@
                                         <!-- Habilidades -->
                                         <li>
                                             <Strong>Habilidades: </Strong>
-                                            <span class="border pl-1 mr-2 text-dark"
+                                            <span class="tag-format pl-1 mr-2 text-dark"
                                                 v-for="hability in curriculum.habilities">
                                                 {{ hability }}
                                             </span>
@@ -391,23 +389,6 @@ export default {
         hideSearchSection () {
             this.divSearch = !this.divSearch;
         },
-
-        // // Método para baixar o arquivo de currículo do servidor
-        // getFile(hash_file) {
-        //     var $filePath = ('http://localhost:3000/public/curriculos/').concat(hash_file);
-        //     console.log($filePath);
-        //     // Requisição GET para buscar currículos relacionados ao interesse dado
-        //     axios.get($filePath, {
-        //         params: {
-        //             hash_file: hash_file
-        //         }                
-        //     },
-        //     {'Content-Type': 'application/x-www-form-urlencoded'},)
-        //     .then(response => {
-
-            
-        //     }); 
-        // }
     },
     computed: {
         isValid() {
@@ -443,7 +424,30 @@ export default {
 </script>
 
 <style>
-.badge-light {
+
+.tag-format {
+    display: inline-block;
+    padding: 0.25em 0.4em;
+    font-size: 75%;
+    font-weight: 500;
+    line-height: 0.5;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    padding: .4rem .25rem;
+    background: #fff;
+    border: 1px solid transparent;
+    background: #a3abb3;
+    border-radius: .25rem;
+    border-color: #dbdbdb;
+}  
+
+.header-gradient{
+    border-radius: 4px;
+    background: linear-gradient(to right, #a3abb3 20%, #ffffff  80%);
+}
+
+.tags-input span {
     color: #ffffff;
     background-color: #ffc107;
 }
@@ -457,15 +461,5 @@ export default {
     background: #000000;
     height: 2px;
     margin-top: -1px;
-}
-
-.border {
-    border-radius: 8px;
-    background: #a3abb3;
-}
-
-.header-gradient{
-    border-radius: 4px;
-    background: linear-gradient(to right, #a3abb3 20%, #ffffff  80%);
 }
 </style>
