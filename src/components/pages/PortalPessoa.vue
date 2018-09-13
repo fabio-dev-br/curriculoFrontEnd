@@ -80,7 +80,7 @@
                                             Última atualização: {{ curriculum.reg_up }}
                                         </small>  
                                         <small>
-                                            <b-link @click="atulizaCurriculum">
+                                            <b-link @click="showModalUpdate">
                                                 Atualizar arquivo
                                             </b-link>
                                         </small>
@@ -123,8 +123,7 @@
         </section>
         
         <!-- Modal de cadastro de currículo -->
-        <b-modal class="text-dark w-50 float-left"
-            hide-footer
+        <b-modal hide-footer
             centered
             title="Cadastro de Currículo"
             size="lg"
@@ -158,7 +157,7 @@
 
                     <!-- Arquivo de currículo -->
                     <b-form-group>
-                        <b-form-file v-model="file" id="file"
+                        <b-form-file v-model="file" id="fileAdd"
                             placeholder="Anexe um currículo..." required></b-form-file>
                         <div class="mt-3"><b-form-text class="font-weight-bold">Arquivo selecionado: {{file && file.name}}</b-form-text></div>
                     </b-form-group>
@@ -182,14 +181,15 @@
                     </b-form-group>
 
                     <!-- Habilidades / Foi colocado um limite de 3 habilidades -->
-                    <b-form-group 
-                        description="Digite no máximo 3 habilidades">
+                    <b-form-group description="Digite no máximo 3 habilidades">
+                        <!-- O placeholder foi linkado com uma variável computada para que quando o usuário
+                        digitar o número limite de habilidades não apareça nada no placeholder -->
                         <b-form-text for="habilitiesTags"> Principais habilidades </b-form-text>
                         <tags-input input-class="form-control"
                             element-id="habilitiesTags"
                             v-model="habilities"
                             :limit = 3
-                            placeholder="Digite uma habilidade"></tags-input> 
+                            :placeholder="placeHolderHabilities"></tags-input> 
                     </b-form-group>
 
                     <!-- Modal footer -->
@@ -202,8 +202,7 @@
         </b-modal>
 
         <!-- Modal de confirmação de remoção -->
-        <b-modal class="text-dark w-50 float-left"
-            hide-footer
+        <b-modal hide-footer
             centered          
             size="md"
             ref="modalRemove">    
@@ -220,6 +219,46 @@
                 </b-row>  
             </div>
             
+        </b-modal>
+
+        <!-- Modal de atualização do currículo -->
+        <b-modal hide-footer
+            centered          
+            size="md"
+            ref="modalUpdate">    
+            <h5 slot="modal-title">
+                <Strong> Atualização de currículo </Strong>
+            </h5>
+            <!-- Modal body -->
+            <div class="modal-body">
+                <!-- Formulário de atualização de currículo -->
+                <b-form id="curriculumUpdateForm" @submit="validateUpdate">                    
+                    <!-- Arquivo de currículo -->
+                    <b-form-group>
+                        <b-form-file v-model="file" id="fileUpdate"
+                            placeholder="Anexe um currículo..." required></b-form-file>
+                        <div class="mt-3"><b-form-text class="font-weight-bold">Arquivo selecionado: {{file && file.name}}</b-form-text></div>
+                    </b-form-group>
+                    
+                    <!-- Habilidades / Foi colocado um limite de 3 habilidades -->
+                    <b-form-group description="Digite no máximo 3 habilidades">
+                        <b-form-text for="habilitiesTagsUpdate"> Principais habilidades </b-form-text>
+                        <tags-input input-class="form-control"
+                            element-id="habilitiesTagsUpdate"
+                            v-model="habilitiesUpdate"
+                            :limit = 3
+                            :placeholder="placeHolderHabilitiesUpdate"></tags-input>
+                    </b-form-group>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer mt-2">
+                        <b-row align-h="end">
+                            <b-btn variant="outline-danger mr-1" @click="hideModalUpdate">Cancelar</b-btn>
+                            <b-btn variant="outline-success" type="submit">Atualizar</b-btn>
+                        </b-row>
+                    </div>  
+                </b-form>
+            </div>
         </b-modal>
     </b-container>
 </template>
@@ -256,6 +295,11 @@ export default {
                 'smart grid'                
             ],
 
+            // Variável para a atualização de habilidades, que ocorre com a atualização do currículo
+            habilitiesUpdate: [
+                'smart grid'                
+            ],
+
             // Variável que recebe o erro do back caso
             // haja algum erro na adição do currículo
             error: null,
@@ -279,13 +323,26 @@ export default {
 
             // Variável para controlar a exibição do modal de confirmação de remoção do currículo
             modalRemove: false,
+
+            // Variável para controlar a exibição do modal de atualização do currículo
+            modalUpdate: false,
         }
     },
     methods: {
-        // Método para intermediar a validação do formulário
+        // Método para intermediar a validação do formulário de adição de currículo
         validateCurriculum($event) {
             if(this.isValid) {            
                 this.addCurriculum();
+            }
+
+            // Previne o recarregamento da página (ou seja, que o evento de submit aconteça)
+            $event.preventDefault();
+        },
+
+        // Método para intermediar a validação do formulário de atualização de currículo
+        validateUpdate($event) {
+            if(this.isValidUpdate) {            
+                this.updateCurriculum();
             }
 
             // Previne o recarregamento da página (ou seja, que o evento de submit aconteça)
@@ -338,10 +395,34 @@ export default {
                 this.alreadyAddCurriculum = false;
                 this.showCurriculum = false;                
             });
-
         },
 
         // Método para atualizar currículo
+        updateCurriculum () {
+            // O token  do usuário é recuperado e adicionado ao header da 
+            // requisição para enviá-lo ao back-end
+            API.token = this.$store.getters.authToken;
+
+            // O objeto formData é instaciado apenas dentro do trecho de código ao
+            // qual ele pertence, através da instrução let
+            let formData = new FormData();
+            
+            formData.append('file', this.file);
+            for (var i = 0; i < this.habilitiesUpdate.length; i++) {
+                formData.append('habilities[]', this.habilitiesUpdate[i]);
+            }
+            
+            // Requisição POST para adicionar as informações do currículo
+            // e o arquivo de currículo
+            API.postFile('/updateCurriculum', formData).then(response => {
+                // Esse log de console é utilizado para utilizar o response declarado
+                // e, assim, o warning, referente à não utilização, não ocorrer na compilação 
+                console.log(response.data.code);
+                
+                // Recarrega a página
+                this.$router.go();
+            });
+        },
 
         // Método que mostra o modal para adicionar currículos
         showModalCurriculum () {
@@ -353,21 +434,56 @@ export default {
             this.$refs.modalRegCurriculum.hide()
         },
 
-        // Método que mostra o modal para adicionar currículos
+        // Método que mostra o modal para confirmar a remoção do currículo
         showModalRemove () {
             this.$refs.modalRemove.show()
         },
 
-        // Método para esconder o modal de adicionar currículos
+        // Método para esconder o modal para confirmar a remoção do currículo
         hideModalRemove () {
             this.$refs.modalRemove.hide()
-        }
+        },
+
+        // Método que mostra o modal para atulizar currículo
+        showModalUpdate () {
+            this.$refs.modalUpdate.show()
+        },
+
+        // Método para esconder o modal de atualizar currículo
+        hideModalUpdate () {
+            this.$refs.modalUpdate.hide()
+        },      
     },
     computed: {
         isValid() {
             // Fazer a validação posteriormente
             return true;
-        }
+        },
+
+        isValidUpdate() {
+            // Fazer a validação posteriormente
+            return true;
+        },
+        
+        // Função computada que altera o placeholder do input de habilities dependendo
+        // da quantidade de habilidades existentes, se chegar no limite o placeholder
+        // é alterado para vazio
+        placeHolderHabilities: function () {
+            if (this.habilities.length < 3) {
+                return 'Digite uma habilidade';
+            } 
+            return '';
+        }, 
+
+        // Função computada que altera o placeholder do input de habilities dependendo
+        // da quantidade de habilidades existentes, se chegar no limite o placeholder
+        // é alterado para vazio
+        placeHolderHabilitiesUpdate: function () {
+            if (this.habilitiesUpdate.length < 3) {
+                return 'Digite uma habilidade';
+            } 
+            return '';
+        }, 
     },
 
     // Função para recuperar as informações do currículo no back-end
@@ -395,7 +511,7 @@ export default {
 
 <style>
 
-.header-gradient{
+.header-gradient {
     border-radius: 4px;
     background: linear-gradient(to right, #a3abb3 20%, #ffffff  80%);
 }

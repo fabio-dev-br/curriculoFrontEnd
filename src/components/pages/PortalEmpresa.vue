@@ -87,8 +87,7 @@
         </section>
 
         <!-- Modal do cadastro de interesses -->
-        <b-modal class="text-dark w-50 float-left"
-            hide-footer
+        <b-modal hide-footer
             centered
             title="Cadastro de Interesses"
             size="lg"
