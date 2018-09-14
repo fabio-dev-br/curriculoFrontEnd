@@ -159,7 +159,7 @@ export default {
             API.post('/forgotMyPass', {
                 email: this.email
             }).then(response => {
-                console.log("inseriu");
+                console.log(response.data.code);
             }).catch(error => {
                 this.error = error.response.data.message;
             });

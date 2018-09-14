@@ -20,96 +20,94 @@
 
         <!-- Seção de currículo -->
         <section>
-            <div class="mt-3 mb-3">                    
-                <b-card-group deck>
-                    <b-card header-tag="header">
-                        <b-container slot="header">
-                            <b-row align-h="start">
-                                <b-col>
-                                    <h2 slot="header">Meu currículo</h2>
-                                </b-col>
+            <div class="mt-3 mb-3">                                    
+                <b-card>
+                    <b-container slot="header">
+                        <b-row align-h="start">
+                            <b-col>
+                                <h2 slot="header">Meu currículo</h2>
+                            </b-col>
 
-                                <!-- Botão para abrir o modal de cadastro de currículo -->
-                                <b-button class="btn btn-sm bg-warning border-warning mr-3"                                     
-                                    @click="showModalCurriculum"
-                                    v-if="!alreadyAddCurriculum"> 
-                                    <icon name="plus"></icon>
-                                </b-button>                                           
-                            </b-row>
-                        </b-container>                                                
-                        
-                        <!-- Se exisitir, o currículo é apresentado junto com o carregamento da página -->
-                        <b-container class="align-items-center w-75" v-if="showCurriculum">
-                            <b-card> 
-                                <!-- Body Currículo -->
-                                <ul class="list-group list-group-flush">
-                                    <!-- Nome -->
-                                    <li class="list-group-item header-gradient border-light">
-                                        <Strong> {{ curriculum.name }} </Strong>
-                                    </li>
-                                    <!-- Área -->
-                                    <li class="list-group-item border-light">
-                                        <Strong>Área: </Strong> {{ curriculum.area }}
-                                    </li>
+                            <!-- Botão para abrir o modal de cadastro de currículo -->
+                            <b-button class="btn btn-sm bg-warning border-warning mr-3"                                     
+                                @click="showModalCurriculum"
+                                v-if="!alreadyAddCurriculum"> 
+                                <icon name="plus"></icon>
+                            </b-button>                                           
+                        </b-row>
+                    </b-container>                                                
+                    
+                    <!-- Se exisitir, o currículo é apresentado junto com o carregamento da página -->
+                    <b-container class="align-items-center w-75" v-if="showCurriculum">
+                        <b-card> 
+                            <!-- Body Currículo -->
+                            <ul class="list-group list-group-flush">
+                                <!-- Nome -->
+                                <li class="list-group-item header-gradient border-light">
+                                    <Strong> {{ curriculum.name }} </Strong>
+                                </li>
+                                <!-- Área -->
+                                <li class="list-group-item border-light">
+                                    <Strong>Área: </Strong> {{ curriculum.area }}
+                                </li>
 
-                                    <!-- Instituição -->
-                                    <li class="list-group-item border-light">
-                                        <Strong>Instituição: </Strong> {{ curriculum.institute }}
-                                    </li>
+                                <!-- Instituição -->
+                                <li class="list-group-item border-light">
+                                    <Strong>Instituição: </Strong> {{ curriculum.institute }}
+                                </li>
 
-                                    <!-- Curso -->
-                                    <li class="list-group-item border-light">
-                                        <Strong>Curso: </Strong> {{ curriculum.course }}
-                                    </li>
+                                <!-- Curso -->
+                                <li class="list-group-item border-light">
+                                    <Strong>Curso: </Strong> {{ curriculum.course }}
+                                </li>
 
-                                    <!-- Ano de formação -->
-                                    <li class="list-group-item border-light">
-                                        <Strong>Ano de formação: </Strong> {{ curriculum.graduate_year }}
-                                    </li>
+                                <!-- Ano de formação -->
+                                <li class="list-group-item border-light">
+                                    <Strong>Ano de formação: </Strong> {{ curriculum.graduate_year }}
+                                </li>
 
-                                    <!-- Link para baixar currículo junto com a data da última atualização -->
-                                    <li class="list-group-item border-light">
-                                        <Strong>
-                                            Arquivo de currículo:                                                     
-                                        </Strong> 
-                                        <b-link :href="'http://localhost:3000/curriculos/' + curriculum.hash_file">
-                                            Baixar
+                                <!-- Link para baixar currículo junto com a data da última atualização -->
+                                <li class="list-group-item border-light">
+                                    <Strong>
+                                        Arquivo de currículo:                                                     
+                                    </Strong> 
+                                    <b-link :href="'http://localhost:3000/curriculos/' + curriculum.hash_file">
+                                        Baixar
+                                    </b-link>
+                                    <br>
+                                    <small class="text-muted mr-2">
+                                        Última atualização: {{ curriculum.reg_up }}
+                                    </small>  
+                                    <small>
+                                        <b-link @click="showModalUpdate">
+                                            Atualizar arquivo
                                         </b-link>
-                                        <br>
-                                        <small class="text-muted mr-2">
-                                            Última atualização: {{ curriculum.reg_up }}
-                                        </small>  
-                                        <small>
-                                            <b-link @click="showModalUpdate">
-                                                Atualizar arquivo
-                                            </b-link>
-                                        </small>
+                                    </small>
 
-                                    </li>
+                                </li>
 
-                                    <!-- Habilidades -->
-                                    <li class="list-group-item border-light">
-                                        <Strong>Habilidades: </Strong>
-                                        <span class="tag-format pl-1 mr-2 text-dark"
-                                            v-for="hability in curriculum.habilities">                                            
-                                                {{ hability }}                                            
-                                        </span>
-                                    </li>
-                                </ul>
-                                
-                                <!-- Footer currículo -->
-                                <div slot="footer" v-if="alreadyAddCurriculum">
-                                    <b-row align-h="end" class="mr-2">
-                                        <!-- Botão para abrir o modal de confirmação de remoção do currículo -->
-                                        <b-button class="btn btn-sm btn-danger text-light" @click="showModalRemove"> 
-                                            Excluir currículo
-                                        </b-button>
-                                    </b-row>                            
-                                </div>
-                            </b-card>                             
-                        </b-container>                                                          
-                    </b-card>
-                </b-card-group>                   
+                                <!-- Habilidades -->
+                                <li class="list-group-item border-light">
+                                    <Strong>Habilidades: </Strong>
+                                    <span class="tag-format pl-1 mr-2 text-dark"
+                                        v-for="hability in curriculum.habilities">                                            
+                                            {{ hability }}                                            
+                                    </span>
+                                </li>
+                            </ul>
+                            
+                            <!-- Footer currículo -->
+                            <div slot="footer" v-if="alreadyAddCurriculum">
+                                <b-row align-h="end" class="mr-2">
+                                    <!-- Botão para abrir o modal de confirmação de remoção do currículo -->
+                                    <b-button class="btn btn-sm btn-danger text-light" @click="showModalRemove"> 
+                                        Excluir currículo
+                                    </b-button>
+                                </b-row>                            
+                            </div>
+                        </b-card>                             
+                    </b-container>                                                          
+                </b-card>                                  
             </div> 
         </section>
 

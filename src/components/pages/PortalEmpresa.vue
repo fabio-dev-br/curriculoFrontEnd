@@ -19,70 +19,68 @@
 
         <!-- Seção de exibição dos interesses existentes -->
         <section class="mb-3">
-            <div v-if="divInterests">
-                <b-card-group deck>
-                    <b-card header-tag="header">
-                        <b-container slot="header">
-                            <b-row align-h="start">
-                                <b-col>
-                                    <h2 slot="header">Meus interesses</h2>
-                                </b-col>                                                            
-                                <template class="mt-2" v-if="!alterToRemoveInterests">
-                                    <!-- Botão para abrir o modal de cadastro de interesses -->
-                                    <b-button class="btn btn-sm bg-warning border-warning mr-3" @click="showModalInterests"> 
-                                        <icon name="plus"></icon>
-                                    </b-button>           
-                                
-                                    <!-- Botão para preparar para a remoção de interesses -->
-                                    <b-button class="btn btn-sm bg-warning border-warning" @click="prepareRemove"> 
-                                        <icon name="minus"></icon>
-                                    </b-button>
-                                </template>                                      
-                            </b-row>
-                        </b-container>                                                
-                        <ul id="interestsList">
-                            <!-- Template que é mostrado inicialmente no carregamento da página
-                            e redireciona para uma pesquisa dos currículos relacionados ao interesse 
-                            em questão                             -->
-                            <template v-if="showInterests">
-                                <li v-for="interest in displayInterests" :key="interest.id">
-                                    <!-- A manipulação dentro do link é para deixar a primeira
-                                    letra do interesse maiúscula -->
-                                    <b-link @click.prevent="search(interest.value)">
-                                        {{ interest.text[0].toUpperCase() + interest.text.slice(1) }}
-                                    </b-link>
-                                </li>                                
-                            </template>
-
-                            <!-- Template que prepara a interface para a remoção de interesses, é acionado pelo botão com ícone minus -->
-                            <template v-else>
-                                <b-form-group >
-                                    <div><strong>Selecione os interesses que deseja deletar: </strong></div>                                    
-                                    
-                                    <!-- Checkbox-group pega o vetor já preparado (text e value), quando os interesses são recuperados
-                                    do back-end, e mostra -->
-                                    <b-form-checkbox-group id="interestsSelected" name="interests"
-                                        v-model="selected" 
-                                        :options="displayInterests" stacked>
-                                    </b-form-checkbox-group>                                    
-                                </b-form-group>                                
-                            </template>                            
-                        </ul>
-                        <div slot="footer" v-if="alterToRemoveInterests">
-                            <b-row align-h="end" class="mr-2">
-                                <!-- Botão para cancelar a remoção dos interesses -->
-                                <b-button class="btn btn-sm btn-danger text-light mr-1" @click="prepareRemove"> 
-                                    Cancelar
+            <div v-if="divInterests">                
+                <b-card>
+                    <b-container slot="header">
+                        <b-row align-h="start">
+                            <b-col>
+                                <h2 slot="header">Meus interesses</h2>
+                            </b-col>                                                            
+                            <template class="mt-2" v-if="!alterToRemoveInterests">
+                                <!-- Botão para abrir o modal de cadastro de interesses -->
+                                <b-button class="btn btn-sm bg-warning border-warning mr-3" @click="showModalInterests"> 
+                                    <icon name="plus"></icon>
+                                </b-button>           
+                            
+                                <!-- Botão para preparar para a remoção de interesses -->
+                                <b-button class="btn btn-sm bg-warning border-warning" @click="prepareRemove"> 
+                                    <icon name="minus"></icon>
                                 </b-button>
+                            </template>                                      
+                        </b-row>
+                    </b-container>                                                
+                    <ul id="interestsList">
+                        <!-- Template que é mostrado inicialmente no carregamento da página
+                        e redireciona para uma pesquisa dos currículos relacionados ao interesse 
+                        em questão                             -->
+                        <template v-if="showInterests">
+                            <li v-for="interest in displayInterests" :key="interest.id">
+                                <!-- A manipulação dentro do link é para deixar a primeira
+                                letra do interesse maiúscula -->
+                                <b-link @click.prevent="search(interest.value)">
+                                    {{ interest.text[0].toUpperCase() + interest.text.slice(1) }}
+                                </b-link>
+                            </li>                                
+                        </template>
 
-                                <!-- Botão para confirmar a remoção dos interesses -->
-                                <b-button class="btn btn-sm btn-warning text-light" @click="removeInterests"> 
-                                    Confirmar
-                                </b-button>        
-                            </b-row>                            
-                        </div>
-                    </b-card>
-                </b-card-group>                
+                        <!-- Template que prepara a interface para a remoção de interesses, é acionado pelo botão com ícone minus -->
+                        <template v-else>
+                            <b-form-group >
+                                <div><strong>Selecione os interesses que deseja deletar: </strong></div>                                    
+                                
+                                <!-- Checkbox-group pega o vetor já preparado (text e value), quando os interesses são recuperados
+                                do back-end, e mostra -->
+                                <b-form-checkbox-group id="interestsSelected" name="interests"
+                                    v-model="selected" 
+                                    :options="displayInterests" stacked>
+                                </b-form-checkbox-group>                                    
+                            </b-form-group>                                
+                        </template>                            
+                    </ul>
+                    <div slot="footer" v-if="alterToRemoveInterests">
+                        <b-row align-h="end" class="mr-2">
+                            <!-- Botão para cancelar a remoção dos interesses -->
+                            <b-button class="btn btn-sm btn-danger text-light mr-1" @click="prepareRemove"> 
+                                Cancelar
+                            </b-button>
+
+                            <!-- Botão para confirmar a remoção dos interesses -->
+                            <b-button class="btn btn-sm btn-warning text-light" @click="removeInterests"> 
+                                Confirmar
+                            </b-button>        
+                        </b-row>                            
+                    </div>
+                </b-card>                
             </div>                
         </section>
 
@@ -395,6 +393,7 @@ export default {
             return true;
         }
     },
+
     // Função para recuperar os interesses da empresa presentes no back-end
     created: function () {
         // O token  do usuário é recuperado e adicionado ao header da 
