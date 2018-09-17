@@ -11,8 +11,9 @@
                         <!-- Senha -->
                         <b-form-group 
                             label="Senha"
-                            label-for="password"                        
-                            description="A senha deve possuir no mínimo">
+                            label-for="userPassword"
+                            :invalid-feedback="invalidPassword"
+                            :state="statePassword">
                             <b-form-input type="password"
                                 id="userPassword"
                                 v-model="password" required></b-form-input> 
@@ -23,14 +24,16 @@
                             label="Confirmação de senha"
                             label-for="confirmPassword"
                             :invalid-feedback="invalidConfirmPassword"
-                            :state="state">
+                            :state="stateConfirmPassword">
                             <b-form-input type="password"
                                 id="confirmPassword"
                                 v-model="confirmPassword" required></b-form-input> 
-                        </b-form-group>
-                        <b-btn variant="success" type="submit">Enviar</b-btn>
-                        
+                        </b-form-group>                                                
                     </b-container>   
+                    <b-row class="mr-3" align-h="end">
+                        <b-btn variant="success" type="submit">Enviar</b-btn>
+                    </b-row>
+                    
                 </b-form>                
             </b-card>
         </section>
@@ -183,6 +186,21 @@ export default {
         hideModalExpiration () {
             this.$refs.modalExpiration.hide()
         },
+
+        // Verifica se a senha é válida
+        validPassword: function (password) {
+            var re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{5,}$/;
+            return re.test(password);
+        },
+
+        // Verifica se a senha de confirmação é a mesma
+        validConfirmPassword: function (confirmPassword, password) {
+            if(confirmPassword == password) {
+                return true;
+            } else {
+                return false;
+            }
+        },
     },
     
     computed: {
@@ -191,15 +209,39 @@ export default {
             return true;
         },
 
-        // Função para validar a confirmação de senha
-        invalidConfirmPassword() {
-            return '1';
+        // Função para determinar o estado do input da senha
+        statePassword() {
+            return this.validPassword(this.password) ? true : false;
         },
 
-        // Função para determinar o estado do input da senha
-        state() {
-            
-        }
+        // Função para determinar o estado do input da confirmação
+        // da senha
+        stateConfirmPassword() {
+            return this.validConfirmPassword(this.confirmPassword, this.password) ? true : false;
+        },
+
+        // Função responsável por mostrar a mensagem
+        // se o input de senha não é válido
+        invalidPassword() {
+            // A senha deve possuir tamanho de no mínimo 5
+            if (this.password.length < 5) {
+                return 'O tamanho mínimo da senha é 5'
+            } else if(this.validPassword()) {
+                return '';                
+            } else {
+                return 'A senha deve possuir no mínimo uma letra maiúscula, uma letra minúscula e um número'
+            }        
+        },
+
+        // Função responsável por mostrar a mensagem
+        // se o input de confirmação de senha não é válido
+        invalidConfirmPassword() {
+            if (this.validConfirmPassword(this.confirmPassword, this.password)) {
+                return '';
+            } else {
+                return "Digite a mesma senha";
+            }
+        },
     },
     
     // Função para verificar se o hash vindo não expirou

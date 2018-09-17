@@ -64,26 +64,48 @@
             <h5 slot="modal-title">
                 <Strong> Recuperação de senha </Strong>
             </h5>
-            <div class="modal-body">
-                <h6>Informe seu e-mail e enviaremos instruções para você redefinir sua senha.</h6>
-                <hr class="separator">
-                <b-form @submit="forgotPass">
+
+            <b-form @submit="validateForgot">
+                <div class="modal-body">
+                    <h6>Informe seu e-mail e enviaremos instruções para você redefinir sua senha.</h6>
+                    <hr class="separator">
+                                        
                     <!-- E-mail -->
-                    <b-form-group>                                    
-                        <b-form-text class="mb-2" for="userEmail">E-mail</b-form-text>
-                        <b-form-input type="email"
-                            id="emailForgot"  
-                            v-model="emailForgot" required></b-form-input>                         
+                    <b-form-group 
+                        id="groupEmailForgot"
+                        label="E-mail"
+                        label-for="userEmail"
+                        :invalid-feedback="invalidForgot"
+                        :state="stateForgot">
+                        <b-form-input id="emailForgot" 
+                            v-model.trim="emailForgot" 
+                            :state="stateForgot"
+                            required></b-form-input>                         
                     </b-form-group>
-                </b-form>
-            </div>
-            <div class="modal-footer mt-2">
-                <b-row align-h="end">
-                    <b-btn variant="dark mr-1" @click="hideModalForgotPass">Cancelar</b-btn>
-                    <b-btn variant="success mr-1" @click="forgotPass">Enviar</b-btn>
-                </b-row>  
-            </div>
-            
+                    
+                </div>
+                <div class="modal-footer mt-2">
+                    <b-row align-h="end">
+                        <b-btn variant="dark mr-1" @click="hideModalForgotPass">Cancelar</b-btn>
+                        <b-btn variant="success mr-1" type="submit">Enviar</b-btn>
+                    </b-row>  
+                </div>
+            </b-form>            
+        </b-modal>
+
+        <!-- Modal para informar o usuário da submissão do e-mail na função de esqueci a senha -->
+        <b-modal hide-footer
+            centered          
+            size="md"
+            ref="modalInfoForgot">    
+            <h5 slot="modal-title">
+                <Strong> Requisição enviada </Strong>
+            </h5>
+            <div class="modal-body">
+                <p>
+                    Se o e-mail informado existe na plataforma, você receberá as instruções para a alteração da senha.
+                </p>
+            </div>            
         </b-modal>
     </section>
 </template>
@@ -110,18 +132,32 @@ export default {
             // haja algum erro na adição do currículo
             error: null,
 
-            // Variável para controlar a exibição do modal de confirmação de remoção do currículo
+            // Variável para controlar a exibição do modal de entrada de
+            // informações que levam a recuperação de senha
             modalForgotPass: false,
 
             // Variável e-mail para a recuperação de senha
             emailForgot: '',
+
+            // Variável para controlar a exibição do modal que
+            // é mostrado logo após submeter o e-mail ao back-end
+            modalInfoForgot: false
         }
     },
     methods: {
-        // Método para intermediar a validação do formulário
+        // Método para intermediar a validação do formulário de login
         validate($event) {
             if(this.isValid) {
                 this.login();
+            }
+            // Previne o recarregamento da página (ou seja, que o evento de submit aconteça)
+            $event.preventDefault();
+        },
+
+        // Método para intermediar a validação do formulário de esqueci a senha
+        validateForgot($event) {
+            if(this.stateForgot) {
+                this.forgotPass();
             }
             // Previne o recarregamento da página (ou seja, que o evento de submit aconteça)
             $event.preventDefault();
@@ -157,10 +193,19 @@ export default {
         forgotPass () {
             // Requisição POST para recuperar a senha
             API.post('/forgotMyPass', {
-                email: this.email
-            }).then(response => {
-                console.log(response.data.code);
+                email: this.emailForgot
+            }).then(response => {                
+                // Esconde o modal de esqueci a senha                
+                this.hideModalForgotPass();
+                
+                // Exibe o modal para informar o usuário
+                this.showModalInfoForgot();
+                
+                // Limpa o campo e-mail do formulário do esqueci a senha
+                this.emailForgot = '';
             }).catch(error => {
+                // Exibe o modal para informar o usuário
+                this.hideModalForgotPass();
                 this.error = error.response.data.message;
             });
         },
@@ -174,11 +219,45 @@ export default {
         hideModalForgotPass () {
             this.$refs.modalForgotPass.hide()
         },
+
+        // Método para exibir o modal de alerta após submeter
+        // o e-mail em esqueci a senha
+        showModalInfoForgot () {
+            this.$refs.modalInfoForgot.show()
+        },
+
+        // Método para esconder o modal de alerta após submeter
+        // o e-mail em esqueci a senha
+        hideModalInfoForgot () {
+            this.$refs.modalInfoForgot.hide()
+        },
+
+        // Verifica se o e-mail é válido
+        validEmail: function (email) {
+            var re = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/gi;
+            return re.test(email);
+        }
     },
     computed: {
         isValid() {
             return this.email && this.password.length > 4;
-        }
+        },
+
+        // Estado do input e-mail, verifica se é válido
+        // o input com uma expressão regular
+        stateForgot () {
+            return this.validEmail(this.emailForgot) ? true : false;
+        },
+        
+        // Função responsável por mostrar a mensagem
+        // se o input do e-mail não é válido
+        invalidForgot () {
+            if (this.validEmail(this.emailForgot)) {
+                return '';
+            } else {
+                return "Digite um e-mail válido";
+            }
+        },
     }
 };
 </script>
