@@ -31,7 +31,7 @@
                         </b-form-group>                                                
                     </b-container>   
                     <b-row class="mr-3" align-h="end">
-                        <b-btn variant="success" type="submit">Enviar</b-btn>
+                        <b-btn :disabled="disabledSendNewPass" variant="outline-success" type="submit">Enviar</b-btn>
                     </b-row>
                     
                 </b-form>                
@@ -41,21 +41,33 @@
         <!-- Modal expirou tempo do hash -->
         <b-modal hide-footer
             hide-header-close
-            centered
+            :hide-header="true"
+            :centered="true"
             :no-close-on-backdrop="true"
             :no-close-on-esc="true"            
             size="md"
-            ref="modalExpiration">    
-            <h3 slot="modal-title"><strong>Ocorreu um erro...</strong></h3>    
+            ref="modalExpiration">  
+
+            <!-- Título do modal -->
+            <div class="modal-title">
+                <b-row  align-h="center">
+                    <h4><strong>Ocorreu um erro...</strong></h4>
+                </b-row>                
+            </div>
+
+            <!-- Separação título e body -->
+            <hr/>
+
             <!-- Modal body -->
-            <b-row>
+            <b-row align-h="center">
                 <b-col>
                     O tempo para a alteração da senha expirou, 
-                    faça uma outra requisição para alterar a senha. 
+                    faça uma outra requisição para alterar a senha.
                 </b-col>                
-            </b-row>                            
+            </b-row>
+
             <b-row class="mt-2" align-h="center">
-                <b-button variant="primary" @click="redirectLogin">
+                <b-button size="md" variant="outline-primary" @click="redirectLogin">
                     Voltar
                 </b-button>
             </b-row>
@@ -63,35 +75,73 @@
 
         <!-- Modal de sucesso -->
         <b-modal hide-footer
-            centered
-            title="Sucesso"
-            size="lg"
-            ref="modalSuccess">    
-                    
-            <!-- Modal body -->
-            <div class="modal-body">
-                123
+            hide-header-close
+            :hide-header="true"
+            :centered="true"
+            :no-close-on-backdrop="true"
+            :no-close-on-esc="true"            
+            size="sm"
+            ref="modalSuccess"> 
+            
+            <!-- Título do modal -->   
+            <div class="modal-title">
+                <b-row  align-h="center">
+                    <h4><strong>Sucesso</strong></h4>
+                </b-row>                
             </div>
+            
+            <!-- Separação título e body -->
+            <hr/>
+
+            <!-- Modal body -->
+            <b-row align-h="center">
+                A troca de senha ocorreu com sucesso.
+            </b-row>                            
+            <b-row class="mt-2" align-h="center">
+                <b-button size="md" variant="outline-primary" @click="redirectSuccess">
+                    Login
+                </b-button>
+            </b-row>
         </b-modal>               
         
         <!-- Modal de erro -->
         <b-modal hide-footer
-            centered
-            title="Algum erro ocorreu"
-            size="lg"
-            ref="modalError">    
-                    
-            <!-- Modal body -->
-            <div class="modal-body">
-                321
+            hide-header-close
+            :hide-header="true"
+            :centered="true"
+            :no-close-on-backdrop="true"
+            :no-close-on-esc="true"            
+            size="sm"
+            ref="modalError">  
+
+            <!-- Título do modal -->
+            <div class="modal-title">
+                <b-row align-h="center">
+                    <h4><strong>Algo deu errado...</strong></h4>
+                </b-row>                
             </div>
+
+            <!-- Separação título e body -->
+            <hr/>
+
+            <!-- Modal body -->
+            <b-row align-h="center">
+                <b-col>
+                    {{ errorChangePass }}
+                </b-col>                
+            </b-row>                            
+            <b-row class="mt-2" align-h="center">
+                <b-button size="md" variant="outline-primary" @click="redirectError">
+                    Tentar outra vez
+                </b-button>
+            </b-row>            
         </b-modal> 
-
-
     </b-container>
 </template>
 
 <script>
+    // O comentário na linha de baixo desbilita os warnings
+/* eslint-disable */
 
 // Imports necessários para fazer a requisição ao servidor
 import API from '../../services/ApiService';
@@ -120,6 +170,10 @@ export default {
             // Variável que recebe o erro do back caso
             // haja algum erro na adição de interesses
             errorChangePass: null,
+
+            // Variável para alterar o estado do botão de enviar
+            // se o conteúdo do formulário é válido
+            disabledSendNewPass: true,
         }
     },
     methods: {
@@ -135,26 +189,22 @@ export default {
 
         // Método para adicionar interesses
         changePassword() {
-            // Recupera os parâmetros provenientes da URL
-            
-            // Requisição POST para adicionar interesses           
-            // API.post('/addInterests', {
-            //     interests: this.interests
-            // }).then(response => {
-            //     // Esse log de console é utilizado para utilizar o response declarado
-            //     // e, assim, o warning, referente à não utilização, não ocorrer na compilação 
-            //     console.log(response.data.code);
-                
-            //     // Recarrega a página
-            //     this.$router.go();
-            // }).catch(error => {
-            //     this.errorAddInterest = error.response.data.message;
-            // });
-        },
+            // Pegar o parâmetro key da URL
+            let uri = this.$route.query.key;
 
-        // Redirecionar para a página de login
-        redirectLogin() {
-            this.$router.push('/login');
+            // Requisição POST para adicionar interesses           
+            API.post('/changeMyPass', {
+                newPass: this.password, 
+                key: uri
+            }).then(response => {
+                // Esse log de console é utilizado para utilizar o response declarado
+                // e, assim, o warning, referente à não utilização, não ocorrer na compilação 
+                console.log(response.data.code);
+                this.showModalSuccess();                                
+            }).catch(error => {
+                this.errorChangePass = error.response.data.message;
+                this.showModalError();
+            });
         },
 
         // Método que mostra o modal de sucesso na troca da senha
@@ -188,18 +238,37 @@ export default {
         },
 
         // Verifica se a senha é válida
-        validPassword: function (password) {
+        validPassword (password) {
             var re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{5,}$/;
             return re.test(password);
         },
 
         // Verifica se a senha de confirmação é a mesma
-        validConfirmPassword: function (confirmPassword, password) {
+        validConfirmPassword (confirmPassword, password) {
             if(confirmPassword == password) {
                 return true;
             } else {
                 return false;
             }
+        },
+
+        // Redirecionamento para a página de login
+        // quando o hash já expirou
+        redirectLogin () {
+            this.$router.push('/login');
+        },
+
+
+        // Redirecionamento para a mesma página
+        // quando ocorre algum erro na troca da senha
+        redirectError () {
+            this.$router.go();
+        },
+
+        // Redirecionamento para a página de login
+        // quando não ocorre erro na troca da senha
+        redirectSuccess () {
+            this.$router.push('/login');
         },
     },
     
@@ -222,33 +291,45 @@ export default {
 
         // Função responsável por mostrar a mensagem
         // se o input de senha não é válido
-        invalidPassword() {
-            // A senha deve possuir tamanho de no mínimo 5
-            if (this.password.length < 5) {
+        invalidPassword() {            
+            // A senha deve possuir no mínimo tamanho 5, uma letra maiúscula, uma letra minúscula e um número
+            // enquanto não for digitado nada, nenhuma mensagem de erro é mostrada
+            if(this.password.length == 0){
+                return '';
+            }else if (this.password.length < 5) {
                 return 'O tamanho mínimo da senha é 5'
-            } else if(this.validPassword()) {
-                return '';                
-            } else {
-                return 'A senha deve possuir no mínimo uma letra maiúscula, uma letra minúscula e um número'
-            }        
+            } else if(!this.validPassword()) {
+                return 'A senha deve possuir no mínimo uma letra maiúscula, uma letra minúscula e um número';
+            }     
         },
 
         // Função responsável por mostrar a mensagem
         // se o input de confirmação de senha não é válido
         invalidConfirmPassword() {
-            if (this.validConfirmPassword(this.confirmPassword, this.password)) {
-                return '';
-            } else {
-                return "Digite a mesma senha";
+            // Enquanto o usuário não digitar o mínimo de caracteres,
+            // não é feita a verificação
+            if(this.confirmPassword.length >= 5){
+                if (this.validConfirmPassword(this.confirmPassword, this.password)) {
+                    // Se chegou nesse ponto da execução, está tudo certo e o
+                    // botão de enviar pode ser habilitado
+                    this.disabledSendNewPass = false;
+                    return '';
+                } else {
+                    return "Digite a mesma senha";
+                }
             }
+            return '';
         },
     },
     
     // Função para verificar se o hash vindo não expirou
     created: function () {                
+        // Pegar o parâmetro key da URL
         let uri = this.$route.query.key;
 
-        // Requisição GET para verificar o hash
+        // Requisição GET para verificar o hash 
+        // (O APIService.js não é utilizado por problemas com o GET 
+        // presente lá, quando se passa parâmetros)
         axios.get('http://localhost:3000/verifyHashChangePass', {
             params: {
                 key: uri

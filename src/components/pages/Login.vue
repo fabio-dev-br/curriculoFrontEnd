@@ -86,8 +86,8 @@
                 </div>
                 <div class="modal-footer mt-2">
                     <b-row align-h="end">
-                        <b-btn variant="dark mr-1" @click="hideModalForgotPass">Cancelar</b-btn>
-                        <b-btn variant="success mr-1" type="submit">Enviar</b-btn>
+                        <b-btn variant="outline-dark mr-1" @click="hideModalForgotPass">Cancelar</b-btn>
+                        <b-btn variant="outline-success mr-1" type="submit">Enviar</b-btn>
                     </b-row>  
                 </div>
             </b-form>            
@@ -95,7 +95,7 @@
 
         <!-- Modal para informar o usuário da submissão do e-mail na função de esqueci a senha -->
         <b-modal hide-footer
-            centered          
+            :centered="true"          
             size="md"
             ref="modalInfoForgot">    
             <h5 slot="modal-title">
@@ -111,6 +111,8 @@
 </template>
 
 <script>
+    // O comentário na linha de baixo desbilita os warnings
+/* eslint-disable */
 
 // Imports necessários para fazer a requisição ao servidor
 import API from '../../services/ApiService';

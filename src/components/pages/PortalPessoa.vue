@@ -90,6 +90,7 @@
                                 <li class="list-group-item border-light">
                                     <Strong>Habilidades: </Strong>
                                     <span class="tag-format pl-1 mr-2 text-dark"
+                                        v-bind:key="hability.id"
                                         v-for="hability in curriculum.habilities">                                            
                                             {{ hability }}                                            
                                     </span>
@@ -122,7 +123,7 @@
         
         <!-- Modal de cadastro de currículo -->
         <b-modal hide-footer
-            centered
+            :centered="true"
             title="Cadastro de Currículo"
             size="lg"
             ref="modalRegCurriculum">    
@@ -201,7 +202,7 @@
 
         <!-- Modal de confirmação de remoção -->
         <b-modal hide-footer
-            centered          
+            :centered="true"          
             size="md"
             ref="modalRemove">    
             <h5 slot="modal-title">
@@ -221,7 +222,7 @@
 
         <!-- Modal de atualização do currículo -->
         <b-modal hide-footer
-            centered          
+            :centered="true"        
             size="md"
             ref="modalUpdate">    
             <h5 slot="modal-title">
@@ -262,6 +263,8 @@
 </template>
 
 <script>
+    // O comentário na linha de baixo desbilita os warnings
+/* eslint-disable */
 
 // Imports necessários para fazer a requisição ao servidor
 import API from '../../services/ApiService';

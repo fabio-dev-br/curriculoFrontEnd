@@ -1,40 +1,36 @@
 <template>
-    <b-container class="p-3">
-        <!-- Seção de boa-vindas na página home -->
-        <b-col>
-            <section class="welcome-section d-flex align-items-center">
-                <div class="container text-center">
-                    <h1>Bem-vindo ao Currículo Incit</h1>  
-                </div>
-            </section>
-        </b-col>
-        <b-col>
+    <!-- Seção de boa-vindas na página home -->    
+    <section>
+        <section class="welcome-section d-flex align-items-center">
+            <b-container class="text-center text-dark">
+                <h1>Bem-vindo ao Currículo Incit</h1>  
+            </b-container>
+        </section>
+        <b-container class="p-3">                        
             <!-- Para lembrar: user_type = 0 para empresa e user_type = 1 para pessoa -->
             <!-- Seção contendo os botões de cadastro -->
-            <section class="pt-2 pb-3">
-                <div class="container">
-                    <div class="row text-center">
-                        <div class="col-sm mt-4">
-                            <!-- Botão para abrir o modal de cadastro de empresas -->
-                            <b-button class="btn btn-lg btn-primary" @click="showModalCompany"> 
-                                Cadastro de empresas 
-                            </b-button>
-                        </div>
-                        <div class="col-sm mt-4">
-                            <!-- Botão para abrir o modal de cadastro de pessoas -->
-                            <b-button class="btn btn-lg btn-primary" @click="showModalPerson">
-                                Cadastro de pessoas
-                            </b-button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </b-col>
-        
+            <section class="p-3">                        
+                <b-row class="text-center">
+                    <b-col class="mt-3">
+                        <!-- Botão para abrir o modal de cadastro de empresas -->
+                        <b-btn variant="outline-dark" size="lg" @click="showModalCompany"> 
+                            Cadastro de empresas 
+                        </b-btn>
+                    </b-col>
+                    <b-col class="mt-3">
+                        <!-- Botão para abrir o modal de cadastro de pessoas -->
+                        <b-btn variant="outline-dark" size="lg" @click="showModalPerson">
+                            Cadastro de pessoas
+                        </b-btn>
+                    </b-col>
+                </b-row>                        
+            </section>            
+        </b-container>
+
         <!-- Modal do cadastro de empresas -->
         <b-modal class="text-dark w-50 float-left"
             hide-footer
-            centered
+            :centered="true"
             title="Cadastro de Empresas"
             size="lg"
             ref="modalRegCompany">                  
@@ -44,14 +40,20 @@
                 <!-- Formulário de empresa, contém: nome, email, cnpj, senha e tipo de usuário(empresa = 0) -->
                 <b-form id="companyForm" @submit="validateCompany">
                     <!-- Nome -->
-                    <b-form-group>
-                        <b-form-text for="companyName"> Nome da empresa </b-form-text>                      
-                        <b-form-input type="text" 
-                            id="companyName"
-                            v-model="name"
-                            placeholder="Digite o nome da empresa... *" required></b-form-input>         
+                    <b-form-group id="inputGroupCompanyName"
+                        label="Nome"
+                        label-for="companyName">                        
+                        <b-form-input id="companyName"
+                            type="text"                             
+                            v-model.trim="name"
+                            :state="!$v.name.$invalid"                            
+                            aria-describedby="inputCompanyNameFeedback"
+                            placeholder="Digite o nome da empresa... *" required></b-form-input>                        
                     </b-form-group>
-
+                    <b-form-invalid-feedback id="inputCompanyNameFeedback">
+                            This is a required field and must be at least 3 characters
+                    </b-form-invalid-feedback>
+                    
                     <!-- E-mail -->
                     <b-form-group description="Digite um e-mail no formato: nome@dominio.com">
                         <b-form-text for="companyEmail"> E-mail da empresa </b-form-text>
@@ -91,7 +93,7 @@
         <!-- Modal do cadastro de pessoas -->
         <b-modal class="text-dark w-50 float-left"
             hide-footer
-            centered
+            :centered="true"
             title="Cadastro de Pessoas"
             size="lg"
             ref="modalRegPerson">   
@@ -144,13 +146,18 @@
                 </b-form>
             </div>    
         </b-modal>
-    </b-container>
+    </section>
 </template>
 
 <script>
+    // O comentário na linha de baixo desbilita os warnings
+/* eslint-disable */
 
 // Imports necessários para fazer a requisição ao servidor
 import API from '../../services/ApiService';
+
+// Import das funções utilizadas do Vuelidate
+import { required, minLength, between } from 'vuelidate/lib/validators'
 
 export default {
     name:"home",
@@ -198,7 +205,8 @@ export default {
             }).then(response => {
                 // Esse log de console é utilizado para utilizar o response declarado
                 // e o warning não ocorrer na compilação 
-                console.log(response.data.code);
+                // console.log(response.data.code);
+
                 // Redireciona para o login em caso de sucesso
                 this.$router.push('/login');                
             }).catch(error => {
@@ -223,6 +231,50 @@ export default {
             // deve garantir que o formulário é valido
             return true;  
         }
+    },
+    // Validações feitas com o auxílio do Vuelidate
+    validations: {
+        name: {
+            required,
+            minLength: minLength(6)
+        },
+        email: {
+
+        },
+        identity: {
+
+        },
+        user_type: {
+        
+        },
+        password: {
+
+        },
     }
 };
+
 </script>
+
+<style>
+
+.welcome-section {
+    background-color: rgba(253, 223, 49, 0.952);
+}
+  
+.welcome-section {
+    min-height: 300px;
+}
+  
+@media (min-width: 576px) {
+    .welcome-section {
+        min-height: 400px;
+    }
+}
+  
+@media (min-width: 768px) {
+    .welcome-section {
+        min-height: 550px;
+    }
+}
+
+</style>

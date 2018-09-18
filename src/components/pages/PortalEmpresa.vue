@@ -86,7 +86,7 @@
 
         <!-- Modal do cadastro de interesses -->
         <b-modal hide-footer
-            centered
+            :centered="true"
             title="Cadastro de Interesses"
             size="lg"
             ref="modalRegInterests">    
@@ -184,6 +184,7 @@
                                         <li>
                                             <Strong>Habilidades: </Strong>
                                             <span class="tag-format pl-1 mr-2 text-dark"
+                                                v-bind:key="hability.id"
                                                 v-for="hability in curriculum.habilities">
                                                 {{ hability }}
                                             </span>
@@ -209,6 +210,8 @@
 </template>
 
 <script>
+    // O comentário na linha de baixo desbilita os warnings
+/* eslint-disable */
 
 // Imports necessários para fazer a requisição ao servidor
 import API from '../../services/ApiService';
@@ -342,6 +345,8 @@ export default {
             this.headerSearch = value;
 
             // Requisição GET para buscar currículos relacionados ao interesse dado
+            // (O APIService.js não é utilizado por problemas com o GET 
+            // presente lá, quando se passa parâmetros)
             axios.get('http://localhost:3000/searchCurByInt', {
                 params: {
                     interests: value
