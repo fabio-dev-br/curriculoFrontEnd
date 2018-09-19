@@ -43,33 +43,65 @@
                     <b-form-group id="inputGroupCompanyName"
                         label="Nome"
                         label-for="companyName">                        
-                        <b-form-input id="companyName"
+                        <b-form-input id="companyName"                            
                             type="text"                             
-                            v-model.trim="name"
-                            :state="!$v.name.$invalid"                            
+                            v-model.trim="formCompany.name"
+                            :state="!$v.formCompany.name.$invalid"
                             aria-describedby="inputCompanyNameFeedback"
-                            placeholder="Digite o nome da empresa... *" required></b-form-input>                        
+                            placeholder="Digite o nome da empresa... *" required></b-form-input>
+
+                        <b-form-invalid-feedback id="inputCompanyNameFeedback">
+                            <p v-if="!$v.formCompany.name.required">
+                                Preencha este campo.
+                            </p> 
+                            <p v-else-if="!$v.formCompany.name.maxLength">
+                                O nome pode ter no máximo tamanho 50.
+                            </p>                            
+                        </b-form-invalid-feedback>
                     </b-form-group>
-                    <b-form-invalid-feedback id="inputCompanyNameFeedback">
-                            This is a required field and must be at least 3 characters
-                    </b-form-invalid-feedback>
-                    
+
                     <!-- E-mail -->
-                    <b-form-group description="Digite um e-mail no formato: nome@dominio.com">
-                        <b-form-text for="companyEmail"> E-mail da empresa </b-form-text>
+                    <b-form-group description="Digite um e-mail no formato: nome@dominio.com"
+                        label="E-mail"
+                        label-for="companyEmail">
                         <b-form-input type="email" 
                             id="companyEmail"
-                            v-model="email"
-                            placeholder="Digite o email... *" required></b-form-input>                    
+                            v-model.trim="formCompany.email"
+                            @input="delayTouch($v.formCompany.email)"
+                            :state="!$v.formCompany.email.$invalid"
+                            aria-describedby="inputCompanyEmailFeedback"
+                            placeholder="Digite o email... *" required></b-form-input>
+                        <b-form-invalid-feedback id="inputCompanyEmailFeedback">
+                            <p v-if="!$v.formCompany.email.required">
+                                Preencha este campo.
+                            </p> 
+                            <p v-else-if="!$v.formCompany.email.email">
+                                Digite um e-mail válido.
+                            </p>
+                            <p v-else-if="!$v.formCompany.email.maxLength">
+                                O e-mail pode ter no máximo tamanho 50.
+                            </p> 
+                            <p v-else-if="!$v.formCompany.email.isUnique">
+                                Esse e-mail já é utilizado.
+                            </p> 
+                        </b-form-invalid-feedback>
                     </b-form-group>
 
                     <!-- CNPJ -->
-                    <b-form-group>
-                        <b-form-text for="companyCnpj"> CNPJ da empresa </b-form-text>
+                    <b-form-group description="Digite apenas os números"
+                        label="CNPJ"
+                        label-for="companyCnpj">
                         <b-form-input type="text"
-                            id="companyCpf"
-                            v-model="identity"
-                            placeholder="Digite o CNPJ da empresa... *" required></b-form-input>
+                            id="companyCnpj"
+                            v-model.trim="formCompany.identity"
+                            :state="!$v.formCompany.identity.$invalid"
+                            aria-describedby="inputCompanyCnpjFeedback"></b-form-input>
+
+                        <b-form-invalid-feedback id="inputCompanyCnpjFeedback">
+                            <p v-if="!$v.formCompany.identity.required">
+                                Preencha este campo.
+                            </p> 
+                        </b-form-invalid-feedback>
                     </b-form-group>
 
                     <!-- Senha -->
@@ -157,7 +189,9 @@
 import API from '../../services/ApiService';
 
 // Import das funções utilizadas do Vuelidate
-import { required, minLength, between } from 'vuelidate/lib/validators'
+import { required, minLength, between, maxLength, email } from 'vuelidate/lib/validators'
+
+const touchMap = new WeakMap()
 
 export default {
     name:"home",
@@ -165,13 +199,30 @@ export default {
         return {
             modalRegCompShow: false,
             modalRegPerShow: false,
+            // Todas as variáveis ficam no objeto formCompany 
+            // para a validação adequada das informações da
+            // empresa, e apenas com tudo certo é possível 
+            // fazer o envio
+            formCompany: {
+                name: '',
+                email: '',
+                identity: '',
+                user_type: '',
+                password: '',                
+            },
+            
+            // Todas as variáveis ficam no objeto formPerson 
+            // para a validação adequada das informações da 
+            // pessoa, e apenas com tudo certo é possível 
+            // fazer o envio
+            formPerson: {},
             name: '',
             email: '',
             identity: '',
             user_type: '',
             password: '',
-            error: null
-    }
+            error: null,
+        }
     },
     methods: {
         // Método para intermediar a validação do formulário de empresa
@@ -183,6 +234,7 @@ export default {
             // Previne o recarregamento da página (ou seja, que o evento de submit aconteça)
             $event.preventDefault();
         },
+
         // Método para intermediar a validação do formulário de pessoa
         validatePerson($event) {
             if(this.isValid) {
@@ -192,6 +244,7 @@ export default {
             // Previne o recarregamento da página (ou seja, que o evento de submit aconteça)
             $event.preventDefault();
         },
+
         // Método para enviar as informações para o cadastro
         sendInfo() {      
             // Requisição POST para cadastrar na plataforma
@@ -213,43 +266,78 @@ export default {
                 this.error = error.response.data.message;
             }); 
         },
+
         showModalCompany () {
             this.$refs.modalRegCompany.show()
         },
+
         hideModalCompany () {
             this.$refs.modalRegCompany.hide()
         },
+
         showModalPerson () {
             this.$refs.modalRegPerson.show()
         },
+
         hideModalPerson () {
             this.$refs.modalRegPerson.hide()
+        },
+
+        delayTouch($v) {
+            $v.$reset()
+            if (touchMap.has($v)) {
+                clearTimeout(touchMap.get($v))
+            }
+            touchMap.set($v, setTimeout($v.$touch, 1000))
         }
     },
     computed: {
         isValid() {
             // deve garantir que o formulário é valido
             return true;  
-        }
+        },
     },
     // Validações feitas com o auxílio do Vuelidate
     validations: {
-        name: {
-            required,
-            minLength: minLength(6)
-        },
-        email: {
+        formCompany: {
+            name: {                
+                required,
+                maxLength: maxLength(50)
+            },
+            email: {
+                required,
+                email,
+                maxLength: maxLength(50),
+                // Função de validação para verificar se o e-mail
+                // já está cadastrado em alguma conta
+                isUnique(value) {
+                    if(value === '') return true;
 
+                    return  API.post('/isEmailUnique',{
+                                email: value
+                            }).then(response => {
+                                console.log(response);
+                                return true;
+                            }).catch(() => {
+                                return false
+                            });                    
+                },
+            },
+            identity: {
+                required,
+            }
         },
-        identity: {
-
-        },
-        user_type: {
         
-        },
-        password: {
+        
+        // identity: {
 
-        },
+        // },
+        // user_type: {
+        
+        // },
+        // password: {
+
+        // },
     }
 };
 
@@ -277,4 +365,7 @@ export default {
     }
 }
 
+form :invalid {
+    background: white;
+}
 </style>
