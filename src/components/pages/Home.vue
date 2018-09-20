@@ -40,15 +40,15 @@
                 <!-- Formulário de empresa, contém: nome, email, cnpj, senha e tipo de usuário(empresa = 0) -->
                 <b-form id="companyForm" @submit="validateCompany">
                     <!-- Nome -->
-                    <b-form-group id="inputGroupCompanyName"
-                        label="Nome"
+                    <b-form-group 
+                        label="Nome *"
                         label-for="companyName">                        
                         <b-form-input id="companyName"                            
                             type="text"                             
                             v-model.trim="formCompany.name"
                             :state="!$v.formCompany.name.$invalid"
                             aria-describedby="inputCompanyNameFeedback"
-                            placeholder="Digite o nome da empresa... *" required></b-form-input>
+                            placeholder="Digite o nome da empresa..." required></b-form-input>
 
                         <b-form-invalid-feedback id="inputCompanyNameFeedback">
                             <p v-if="!$v.formCompany.name.required">
@@ -61,16 +61,15 @@
                     </b-form-group>
 
                     <!-- E-mail -->
-                    <b-form-group description="Digite um e-mail no formato: nome@dominio.com"
-                        label="E-mail"
+                    <b-form-group
+                        label="E-mail *"
                         label-for="companyEmail">
                         <b-form-input type="email" 
-                            id="companyEmail"
+                            ref="companyEmail"
                             v-model.trim="formCompany.email"
-                            @input="delayTouch($v.formCompany.email)"
                             :state="!$v.formCompany.email.$invalid"
                             aria-describedby="inputCompanyEmailFeedback"
-                            placeholder="Digite o email... *" required></b-form-input>
+                            placeholder="nome@dominio.com" required></b-form-input>
                         <b-form-invalid-feedback id="inputCompanyEmailFeedback">
                             <p v-if="!$v.formCompany.email.required">
                                 Preencha este campo.
@@ -88,35 +87,54 @@
                     </b-form-group>
 
                     <!-- CNPJ -->
-                    <b-form-group description="Digite apenas os números"
-                        label="CNPJ"
-                        label-for="companyCnpj">
+                    <b-form-group
+                        label="CNPJ *"
+                        label-for="companyIdentity">
                         <b-form-input type="text"
-                            id="companyCnpj"
+                            id="companyIdentity"
                             v-model.trim="formCompany.identity"
                             :state="!$v.formCompany.identity.$invalid"
-                            aria-describedby="inputCompanyCnpjFeedback"></b-form-input>
+                            aria-describedby="inputCompanyIdentityFeedback"
+                            placeholder="XX.XXX.XXX/XXXX-XX"></b-form-input>
 
-                        <b-form-invalid-feedback id="inputCompanyCnpjFeedback">
+                        <b-form-invalid-feedback id="inputCompanyIdentityFeedback">
                             <p v-if="!$v.formCompany.identity.required">
                                 Preencha este campo.
+                            </p>
+                            <p v-else-if="!$v.formCompany.identity.isValid">
+                                O CNPJ informado não é válido.
                             </p> 
                         </b-form-invalid-feedback>
                     </b-form-group>
 
                     <!-- Senha -->
-                    <b-form-group description="A senha deve possuir no mínimo">
-                        <b-form-text for="companyPassword"> Senha </b-form-text>
+                    <b-form-group
+                        label="Senha *"
+                        label-for="companyPassword">
                         <b-form-input type="password"
                             id="companyPassword"
-                            v-model="password"
-                            placeholder="Digite a senha... *" required></b-form-input> 
+                            v-model.trim="formCompany.password"
+                            :state="!$v.formCompany.password.$invalid"
+                            aria-describedby="inputCompanyPasswordFeedback" required></b-form-input>
+                        
+                        <b-form-invalid-feedback id="inputCompanyPasswordFeedback">
+                            <p v-if="!$v.formCompany.password.required">
+                                Preencha este campo.
+                            </p>
+                            <p v-else-if="!$v.formCompany.password.minLength">
+                                A senha deve possuir no mínimo tamanho 5.
+                            </p> 
+                            <p v-else-if="!$v.formCompany.password.isValid">
+                                A senha deve possuir no mínimo uma letra maiúscula, uma letra minúscula e um número.
+                            </p> 
+                        </b-form-invalid-feedback>    
                     </b-form-group>
 
-                    <!-- Modal footer (Quando há o clique no botão enviar a variável user_type recebe 0) -->
+                    <!-- Modal footer (Quando há o clique no botão enviar 
+                         a variável user_type recebe 0 na função de validate) -->
                     <div class="modal-footer">              
                         <b-btn variant="outline-danger" @click="hideModalCompany">Fechar</b-btn>
-                        <b-btn variant="outline-success" type="submit">Enviar</b-btn>
+                        <b-btn :disabled="$v.formCompany.$invalid" variant="outline-success" type="submit">Enviar</b-btn>
                     </div>
                 </b-form>
             </div>
@@ -135,48 +153,165 @@
                 <!-- Formulário de pessoa, contém: nome, email, cpf, senha e tipo de usuário(pessoa = 1) -->
                 <b-form id="personForm" @submit="validatePerson">                    
                     <!-- Nome -->
-                    <b-form-group>
-                        <b-form-text for="personName"> Nome </b-form-text>
-                        <b-form-input type="text"
-                            id="personName"
-                            v-model="name"
-                            placeholder="Digite o seu nome... *" required></b-form-input>                        
+                    <b-form-group
+                        label="Nome *"
+                        label-for="personName">                
+                        <b-form-input id="personName"                        
+                            type="text"                             
+                            v-model.trim="formPerson.name"
+                            :state="!$v.formPerson.name.$invalid"
+                            aria-describedby="inputPersonNameFeedback"
+                            placeholder="Digite o seu nome..." required></b-form-input>
+                        <b-form-invalid-feedback id="inputCompanyNameFeedback">
+                            <p v-if="!$v.formCompany.name.required">
+                                Preencha este campo.
+                            </p> 
+                            <p v-else-if="!$v.formCompany.name.maxLength">
+                                O nome pode ter no máximo tamanho 50.
+                            </p>                            
+                        </b-form-invalid-feedback>
                     </b-form-group>
 
                     <!-- E-mail -->
-                    <b-form-group description="Digite um e-mail no formato: nome@dominio.com">
-                        <b-form-text for="personEmail"> E-mail </b-form-text>
-                        <b-form-input type="email"
-                            id="personEmail"
-                            v-model="email"
-                            placeholder="Digite o seu email... *" required></b-form-input>                        
+                    <b-form-group
+                        label="E-mail *"
+                        label-for="personEmail">
+                        <b-form-input type="email" 
+                            ref="personEmail"
+                            v-model.trim="formPerson.email"
+                            :state="!$v.formPerson.email.$invalid"
+                            aria-describedby="inputPersonEmailFeedback"
+                            placeholder="nome@dominio.com" required></b-form-input>
+                        <b-form-invalid-feedback id="inputPersonEmailFeedback">
+                            <p v-if="!$v.formPerson.email.required">
+                                Preencha este campo.
+                            </p> 
+                            <p v-else-if="!$v.formPerson.email.email">
+                                Digite um e-mail válido.
+                            </p>
+                            <p v-else-if="!$v.formPerson.email.maxLength">
+                                O e-mail pode ter no máximo tamanho 50.
+                            </p> 
+                            <p v-else-if="!$v.formPerson.email.isUnique">
+                                Esse e-mail já é utilizado.
+                            </p> 
+                        </b-form-invalid-feedback>
                     </b-form-group>
 
                     <!-- CPF -->
-                    <b-form-group>
-                        <b-form-text for="personCpf"> CPF </b-form-text>
-                        <b-form-input type="text" 
-                            id="personCpf"
-                            v-model="identity"
-                            placeholder="Digite o seu CPF... *" required></b-form-input>                        
+                    <b-form-group
+                        label="CPF *"
+                        label-for="personIdentity">
+                        <b-form-input type="text"
+                            id="personIdentity"
+                            v-model.trim="formPerson.identity"
+                            :state="!$v.formPerson.identity.$invalid"
+                            aria-describedby="inputPersonIdentityFeedback"
+                            placeholder="XXX.XXX.XXX-XX"></b-form-input>
+
+                        <b-form-invalid-feedback id="inputPersonIdentityFeedback">
+                            <p v-if="!$v.formPerson.identity.required">
+                                Preencha este campo.
+                            </p>
+                            <p v-else-if="!$v.formPerson.identity.isValid">
+                                O CPF informado não é válido.
+                            </p> 
+                        </b-form-invalid-feedback>
                     </b-form-group>
 
                     <!-- Senha -->
-                    <b-form-group description="A senha deve possuir no mínimo">
-                        <b-form-text for="personPassword"> Senha </b-form-text>
-                        <b-form-input type="password" 
+                    <b-form-group
+                        label="Senha *"
+                        label-for="personPassword">
+                        <b-form-input type="password"
                             id="personPassword"
-                            v-model="password"
-                            placeholder="Digite uma senha... *" required></b-form-input>
+                            v-model.trim="formPerson.password"
+                            :state="!$v.formPerson.password.$invalid"
+                            aria-describedby="inputPersonPasswordFeedback" required></b-form-input>
+                        
+                        <b-form-invalid-feedback id="inputPersonPasswordFeedback">
+                            <p v-if="!$v.formPerson.password.required">
+                                Preencha este campo.
+                            </p>
+                            <p v-else-if="!$v.formPerson.password.minLength">
+                                A senha deve possuir no mínimo tamanho 5.
+                            </p> 
+                            <p v-else-if="!$v.formPerson.password.isValid">
+                                A senha deve possuir no mínimo uma letra maiúscula, uma letra minúscula e um número.
+                            </p> 
+                        </b-form-invalid-feedback>    
                     </b-form-group>
 
-                    <!-- Modal footer (Quando há o clique no botão enviar a variável user_type recebe 1) -->
+                    <!-- Modal footer (Quando há o clique no botão enviar 
+                         a variável user_type recebe 1 na função de validate) -->
                     <div class="modal-footer">              
                         <b-btn variant="outline-danger" @click="hideModalPerson">Fechar</b-btn>
-                        <b-btn variant="outline-success" type="submit">Enviar</b-btn>
+                        <b-btn :disabled="$v.formPerson.$invalid" variant="outline-success" type="submit">Enviar</b-btn>
                     </div>
                 </b-form>
             </div>    
+        </b-modal>
+
+        <!-- Modal de sucesso -->
+        <b-modal hide-footer
+            hide-header-close
+            :hide-header="true"
+            :centered="true"
+            :no-close-on-backdrop="true"
+            :no-close-on-esc="true"            
+            size="sm"
+            ref="modalSuccess"> 
+            
+            <!-- Título do modal -->   
+            <div class="modal-title">
+                <b-row  align-h="center">
+                    <h4><strong>Sucesso</strong></h4>
+                </b-row>                
+            </div>
+            
+            <!-- Separação título e body -->
+            <hr/>
+
+            <!-- Modal body -->
+            <b-row align-h="center">
+                O cadastro ocorreu com sucesso.
+            </b-row>                            
+            <b-row class="mt-2" align-h="center">
+                <b-button size="md" variant="outline-primary" @click="redirectSuccess">
+                    Login
+                </b-button>
+            </b-row>
+        </b-modal>               
+        
+        <!-- Modal de erro -->
+        <b-modal hide-footer
+            hide-header-close
+            :hide-header="true"
+            :centered="true"
+            :no-close-on-backdrop="true"
+            :no-close-on-esc="true"            
+            size="sm"
+            ref="modalError">  
+
+            <!-- Título do modal -->
+            <div class="modal-title">
+                <b-row align-h="center">
+                    <h4><strong>Algo deu errado...</strong></h4>
+                </b-row>                
+            </div>
+
+            <!-- Separação título e body -->
+            <hr/>
+
+            <!-- Modal body -->
+            <b-row align-h="center">
+                O cadastro não ocorreu corretamente.
+            </b-row>                            
+            <b-row class="mt-2" align-h="center">
+                <b-button size="md" variant="outline-primary" @click="redirectError">
+                    Tentar outra vez
+                </b-button>
+            </b-row>            
         </b-modal>
     </section>
 </template>
@@ -189,16 +324,25 @@
 import API from '../../services/ApiService';
 
 // Import das funções utilizadas do Vuelidate
-import { required, minLength, between, maxLength, email } from 'vuelidate/lib/validators'
-
-const touchMap = new WeakMap()
+import { required, minLength, between, maxLength, email, numeric } from 'vuelidate/lib/validators'
 
 export default {
     name:"home",
     data () {
         return {
+            // Variável para controlar a exibição do modal de sucesso no cadastro
+            modalSuccess: false,
+
+            // Variável para controlar a exibição do modal se algum erro aconteceu 
+            // no cadastro
+            modalError: false,
+
+            // Variável para controlar a exibição do modal de cadastro de empresa
             modalRegCompShow: false,
+
+            // Variável para controlar a exibição do modal de cadastro de pessoa
             modalRegPerShow: false,
+
             // Todas as variáveis ficam no objeto formCompany 
             // para a validação adequada das informações da
             // empresa, e apenas com tudo certo é possível 
@@ -215,12 +359,14 @@ export default {
             // para a validação adequada das informações da 
             // pessoa, e apenas com tudo certo é possível 
             // fazer o envio
-            formPerson: {},
-            name: '',
-            email: '',
-            identity: '',
-            user_type: '',
-            password: '',
+            formPerson: {
+                name: '',
+                email: '',
+                identity: '',
+                user_type: '',
+                password: '',
+            },
+
             error: null,
         }
     },
@@ -228,8 +374,8 @@ export default {
         // Método para intermediar a validação do formulário de empresa
         validateCompany($event) {            
             if(this.isValid) {
-                this.user_type = 0;
-                this.sendInfo();
+                this.formCompany.user_type = 0;
+                this.sendInfoCompany();
             }
             // Previne o recarregamento da página (ou seja, que o evento de submit aconteça)
             $event.preventDefault();
@@ -238,64 +384,127 @@ export default {
         // Método para intermediar a validação do formulário de pessoa
         validatePerson($event) {
             if(this.isValid) {
-                this.user_type = 1;
-                this.sendInfo();
+                this.formPerson.user_type = 1;
+                this.sendInfoPerson();
             }
             // Previne o recarregamento da página (ou seja, que o evento de submit aconteça)
             $event.preventDefault();
         },
 
-        // Método para enviar as informações para o cadastro
-        sendInfo() {      
-            // Requisição POST para cadastrar na plataforma
-              
+        // Método para enviar as informações para o cadastro de empresa
+        sendInfoCompany() {      
+            // Tratamento do CNPJ
+            let cnpj = this.formCompany.identity;
+            cnpj = cnpj.replace(/[^\d]/g,"");
+            
+            // Requisição POST para cadastrar na plataforma              
             API.post('/newAccount', {
-                name: this.name,
-                email: this.email,
-                identity: this.identity,
-                user_type: this.user_type,
-                password: this.password
-            }).then(response => {
-                // Esse log de console é utilizado para utilizar o response declarado
-                // e o warning não ocorrer na compilação 
-                // console.log(response.data.code);
-
+                name: this.formCompany.name,
+                email: this.formCompany.email,
+                identity: cnpj,
+                user_type: this.formCompany.user_type,
+                password: this.formCompany.password
+            }).then(() => {
                 // Redireciona para o login em caso de sucesso
-                this.$router.push('/login');                
+                this.showModalSuccess();                
             }).catch(error => {
                 this.error = error.response.data.message;
+                this.showModalError();
             }); 
         },
 
+        // Método para enviar as informações para o cadastro de pessoa
+        sendInfoPerson() {      
+            // Tratamento do CPF
+            let cpf = this.formCompany.identity;
+            cpf = cpf.replace(/[^\d]/g,"");
+            
+            // Requisição POST para cadastrar na plataforma              
+            API.post('/newAccount', {
+                name: this.formPerson.name,
+                email: this.formPerson.email,
+                identity: cpf,
+                user_type: this.formPerson.user_type,
+                password: this.formPerson.password
+            }).then(() => {
+                // Redireciona para o login em caso de sucesso
+                this.showModalSuccess();
+            }).catch(error => {
+                this.error = error.response.data.message;
+                this.showModalError();
+            }); 
+        },
+
+        // Método que mostra o modal de cadastro de empresa
         showModalCompany () {
-            this.$refs.modalRegCompany.show()
+            this.$refs.modalRegCompany.show();
         },
 
+        // Método que esconde o modal de cadastro de empresa
         hideModalCompany () {
-            this.$refs.modalRegCompany.hide()
+            this.$refs.modalRegCompany.hide();
         },
 
+        // Método que mostra o modal de cadastro de pessoa
         showModalPerson () {
-            this.$refs.modalRegPerson.show()
+            this.$refs.modalRegPerson.show();
         },
-
+        
+        // Método que esconde o modal de cadastro de pessoa
         hideModalPerson () {
-            this.$refs.modalRegPerson.hide()
+            this.$refs.modalRegPerson.hide();
+        },
+        
+        // Método que mostra o modal de sucesso no cadastro
+        showModalSuccess () {
+            this.$refs.modalSuccess.show();
         },
 
-        delayTouch($v) {
-            $v.$reset()
-            if (touchMap.has($v)) {
-                clearTimeout(touchMap.get($v))
-            }
-            touchMap.set($v, setTimeout($v.$touch, 1000))
-        }
+        // Método que esconde o modal de sucesso no cadastro
+        hideModalSuccess () {
+            this.$refs.modalSuccess.hide();
+        },
+
+        // Método que mostra o modal de erro no cadastro
+        showModalError () {
+            this.$refs.modalError.show();
+        },
+
+        // Método que esconde o modal de erro no cadastro
+        hideModalError () {
+            this.$refs.modalError.hide();
+        },
+
+        // Redirecionamento para a mesma página
+        // quando ocorre algum erro na troca da senha
+        redirectError () {
+            this.$router.go();
+        },
+
+        // Redirecionamento para a página de login
+        // quando não ocorre erro na troca da senha
+        redirectSuccess () {
+            this.$router.push('/login');
+        },
+
+        // // Função necessária para setar o state
+        // // de company e-mail, já que o gerenciamento
+        // // foi prejudicado com a adição da função isUnique
+        // // em validations
+        // defineStateCompanyEmail () {
+        //     if(this.$refs.companyEmail.data == '') {
+        //         this.$refs.companyEmail.state = true;
+        //     } else if({
+
+        //     }
+        // },
     },
     computed: {
         isValid() {
             // deve garantir que o formulário é valido
             return true;  
         },
+    
     },
     // Validações feitas com o auxílio do Vuelidate
     validations: {
@@ -308,38 +517,162 @@ export default {
                 required,
                 email,
                 maxLength: maxLength(50),
-                // Função de validação para verificar se o e-mail
-                // já está cadastrado em alguma conta
-                isUnique(value) {
-                    if(value === '') return true;
 
-                    return  API.post('/isEmailUnique',{
-                                email: value
-                            }).then(response => {
-                                console.log(response);
-                                return true;
-                            }).catch(() => {
-                                return false
-                            });                    
-                },
+                // // Função de validação para verificar se o e-mail
+                // // já está cadastrado em alguma conta
+                // isUnique(value) {
+                //     // Em funções próprias é bom, para quando não tiver
+                //     // nada no input retornar true
+                //     if(value === '') return true;
+
+                //     return  API.post('/isEmailUnique',{
+                //                 email: value
+                //             }).then(response => {
+                //                 console.log(response);
+                //                 return true;
+                //             }).catch(() => {
+                //                 return false
+                //             });                    
+                // },
             },
             identity: {
                 required,
+
+                // Função que verifica se o CNPJ informado é válido
+                isValid(value) {
+                    // Em funções próprias é bom, para quando não tiver
+                    // nada no input retornar true
+                    if(value === '') return true;
+                    
+                    var cnpj = value;
+                    
+                    // Vetor contendo os multiplicadores para o 
+                    // cálculo dos dígitos verificadores
+                    var multi = [6,5,4,3,2,9,8,7,6,5,4,3,2];
+                    
+                    // Retira qualquer caracter especial do valor proveniente
+                    if((cnpj = cnpj.replace(/[^\d]/g,"")).length != 14)
+                        return false;
+
+                    // Verifica se só existem 0 nos 14 dígitos
+                    if(/0{14}/.test(cnpj))                        
+                        return false;
+
+                    // Cálcula 1º dígito verificador
+                    for (var i = 0, n = 0; i < 12; n += cnpj[i] * multi[++i]);
+                    if(cnpj[12] != (((n %= 11) < 2) ? 0 : 11 - n))
+                        return false;
+                    
+                    // Cálcula 2º dígito verificador
+                    for (var i = 0, n = 0; i <= 12; n += cnpj[i] * multi[i++]);
+                    if(cnpj[13] != (((n %= 11) < 2) ? 0 : 11 - n))
+                        return false;
+
+                    return true;
+                }
+                
+            },
+            password: {
+                required,
+                minLength: minLength (5),
+                isValid(value) {
+                    // Em funções próprias é bom, para quando não tiver
+                    // nada no input retornar true
+                    if(value === '') return true;
+                    
+                    // Verifica se a senha possui pelo menos uma letra maiúscula, uma letra minúscula e um número.
+                    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{5,}$/.test(value);
+                }
             }
         },
-        
-        
-        // identity: {
+        formPerson: {
+            name: {                
+                required,
+                maxLength: maxLength(50)
+            },
+            email: {
+                required,
+                email,
+                maxLength: maxLength(50),
 
-        // },
-        // user_type: {
-        
-        // },
-        // password: {
+                // Função de validação para verificar se o e-mail
+                // já está cadastrado em alguma conta
+                // isUnique(value) {
+                //     // Em funções próprias é bom, para quando não tiver
+                //     // nada no input retornar true
+                //     if(value === '') return true;
 
-        // },
+                //     return  API.post('/isEmailUnique',{
+                //                 email: value
+                //             }).then(response => {
+                //                 console.log(response);
+                //                 return true;
+                //             }).catch(() => {
+                //                 return false
+                //             });                    
+                // },
+            },
+            identity: {
+                required,
+
+                // Função que verifica se o CPF informado é válido
+                isValid(value) {  
+                    // Em funções próprias é bom, para quando não tiver
+                    // nada no input retornar true
+                    if(value === '') return true;
+                    
+                    var cpf = value;
+                    
+                    // Retira qualquer caracter especial do valor proveniente
+                    // e verifica se o tamanho é 11
+                    if((cpf = cpf.replace(/[^\d]/g,"")).length != 11)
+                        return false;
+                    
+                    // Verifica se só existem 0 nos 11 dígitos
+                    if(/0{11}/.test(cpf))                        
+                        return false;
+                        
+                    var r;
+                    var s = 0;   
+                    
+                    // Cálcula 1º dígito verificador
+                    for (var i = 1, s = 0; i <= 9; s += parseInt(cpf[i-1]) * (11 - i++));
+
+                    r = (s * 10) % 11;
+                    if ((r == 10) || (r == 11)) 
+                        r = 0;
+
+                    if (r != parseInt(cpf[9]))
+                        return false;
+
+                    // Cálcula 2º dígito verificador                   
+                    for (var i = 1, s = 0; i <= 10; s += parseInt(cpf[i-1]) * (12 - i++));
+
+                    r = (s * 10) % 11;
+                    if ((r == 10) || (r == 11)) 
+                        r = 0;
+
+                    if (r != parseInt(cpf[10]))
+                        return false;
+
+                    return true;   
+                }          
+            },
+            password: {
+                required,
+                minLength: minLength (5),
+                isValid(value) {
+                    // Em funções próprias é bom, para quando não tiver
+                    // nada no input retornar true
+                    if(value === '') return true;
+                    
+                    // Verifica se a senha possui pelo menos uma letra maiúscula, uma letra minúscula e um número.
+                    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{5,}$/.test(value);
+                }
+            }
+        },
     }
-};
+}
 
 </script>
 

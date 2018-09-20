@@ -196,10 +196,7 @@ export default {
             API.post('/changeMyPass', {
                 newPass: this.password, 
                 key: uri
-            }).then(response => {
-                // Esse log de console é utilizado para utilizar o response declarado
-                // e, assim, o warning, referente à não utilização, não ocorrer na compilação 
-                console.log(response.data.code);
+            }).then(() => {                
                 this.showModalSuccess();                                
             }).catch(error => {
                 this.errorChangePass = error.response.data.message;
