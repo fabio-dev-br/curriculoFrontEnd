@@ -1,7 +1,8 @@
 <template>
     <b-container>
         
-        <!-- Seção contendo o campo de pesquisa e o botão de cadastro de currículo -->
+        <!-- Seção contendo o campo de pesquisa e o botão de cadastro de currículo
+             (pesquisa direta não foi implementada ainda) -->
         <section class="pt-2 pb-3">
             <b-container>
                 <b-card>
@@ -112,7 +113,8 @@
             </div> 
         </section>
 
-        <!-- Seção de exibição de resultados -->
+        <!-- Seção de exibição de resultados da pesquisa 
+             (pesquisa direta não foi implementada ainda) -->
         <section>
                 <b-container>
                     <h1 v-if="ifResults">
@@ -121,7 +123,7 @@
                 </b-container>
         </section>
         
-        <!-- Modal de cadastro de currículo -->
+        <!-- Modal de cadastro de currículo (Precisa de validação)-->
         <b-modal hide-footer
             :centered="true"
             title="Cadastro de Currículo"
@@ -133,9 +135,13 @@
                 <!-- Formulário de currículo, contém: área, curso, arquivo, instituto, ano de formação, id de usuário e habilidades -->
                 <b-form id="curriculumForm" @submit="validateCurriculum">
                     <!-- Área -->
-                    <b-form-group>
-                        <b-form-text for="curriculumArea"> Área </b-form-text>                                          
-                        <b-form-select id="curriculumArea" v-model="area" required>
+                    <b-form-group
+                        label="Àrea"
+                        label-for="curriculumArea">
+                        <b-form-select id="curriculumArea" 
+                            v-model="formCurriculum.area" 
+                            :state="!$v.formCurriculum.area.$invalid" 
+                            aria-describedby="inputCurriculumAreaFeedback" required>
                             <template slot="first">
                                 <option :value="null" disabled> Escolha a área maior de atuação... *</option>
                             </template>                            
@@ -143,54 +149,101 @@
                             <option value="humanas"> Humanas </option>
                             <option value="biologicas"> Biológicas </option>
                         </b-form-select>
+                        <b-form-invalid-feedback id="inputCurriculumAreaFeedback">
+                            <p v-if="!$v.formCurriculum.area.required">
+                                Selecione uma opção.
+                            </p>                                      
+                        </b-form-invalid-feedback>
                     </b-form-group>
 
                     <!-- Curso -->
-                    <b-form-group>
-                        <b-form-text for="curriculumCourse"> Curso </b-form-text>
-                        <b-form-input type="text" 
+                    <b-form-group
+                        label="Curso"
+                        label-for="curriculumCourse">
+                        <b-form-input type="text"
                             id="curriculumCourse"        
-                            v-model="course"
+                            v-model="formCurriculum.course"
+                            :state="!$v.formCurriculum.course.$invalid"                            
+                            aria-describedby="inputCurriculumCourseFeedback"
                             placeholder="Digite o curso de formação... *" required></b-form-input>
+                        <b-form-invalid-feedback id="inputCurriculumCourseFeedback">
+                            <p v-if="!$v.formCurriculum.course.required">
+                                Preencha este campo.
+                            </p>                                      
+                        </b-form-invalid-feedback>                        
                     </b-form-group>
 
                     <!-- Arquivo de currículo -->
-                    <b-form-group>
-                        <b-form-file v-model="file" id="fileAdd"
+                    <!-- O <b-form-file> não suporta o <b-form-invalid-feedback> -->
+                    <b-form-group
+                        label="Arquivo"
+                        label-for="fileAdd">
+                        <b-form-file id="fileAdd"
+                            v-model="formCurriculum.file" 
+                            :state="!$v.formCurriculum.file.$invalid"
                             placeholder="Anexe um currículo..." required></b-form-file>
-                        <div class="mt-3"><b-form-text class="font-weight-bold">Arquivo selecionado: {{file && file.name}}</b-form-text></div>
+                        <div v-if="$v.formCurriculum.file.$invalid" class="mt-3">
+                            <p class="font-weight-bold text-danger">
+                                Arquivo selecionado: Nenhum arquivo selecionado
+                            </p>
+                        </div>
+                        <div v-if="!$v.formCurriculum.file.$invalid" class="mt-3">
+                            <p class="font-weight-bold text-success">
+                                Arquivo selecionado: {{formCurriculum.file && formCurriculum.file.name}}
+                            </p>
+                        </div>
                     </b-form-group>
 
                     <!-- Instituição de ensino -->
-                    <b-form-group>
-                        <b-form-text for="curriculumInstitute"> Instituição de ensino </b-form-text>
+                    <b-form-group
+                        label="Instituição de ensino"
+                        label-for="curriculumInstitute">
                         <b-form-input type="text" 
                             id="curriculumInstitute"        
-                            v-model="institute"
+                            v-model="formCurriculum.institute"
+                            :state="!$v.formCurriculum.institute.$invalid"
+                            aria-describedby="inputCurriculumInstituteFeedback"
                             placeholder="Digite o instituto de formação... *" required></b-form-input>
+                        <b-form-invalid-feedback id="inputCurriculumInstituteFeedback">
+                            <p v-if="!$v.formCurriculum.institute.required">
+                                Preencha este campo.
+                            </p>                                      
+                        </b-form-invalid-feedback>   
                     </b-form-group>
 
+
                     <!-- Ano de formação -->
-                    <b-form-group>
-                        <b-form-text for="curriculumGradYear"> Ano de formação </b-form-text>
+                    <b-form-group
+                        label="Ano de formação"
+                        label-for="curriculumGradYear">
                         <b-form-input type="text" 
-                            id="curriculumGradYear"        
-                            v-model="graduateYear"
+                            id="curriculumGradYear"
+                            v-model="formCurriculum.graduateYear"
+                            :state="!$v.formCurriculum.graduateYear.$invalid"
+                            aria-describedby="inputCurriculumGradYearFeedback"
                             placeholder="yyyy *" required></b-form-input>
+                        <b-form-invalid-feedback id="inputCurriculumGradYearFeedback">
+                            <p v-if="!$v.formCurriculum.graduateYear.required">
+                                Preencha este campo.
+                            </p>                                      
+                        </b-form-invalid-feedback>
                     </b-form-group>
 
                     <!-- Habilidades / Foi colocado um limite de 3 habilidades -->
-                    <b-form-group description="Digite no máximo 3 habilidades">
+                    <b-form-group 
+                        label="Principais habilidades"
+                        label-for="habilitiesTags"
+                        description="Digite no máximo 3 habilidades">
                         <!-- O placeholder foi linkado com uma variável computada para que quando o usuário
                         digitar o número limite de habilidades não apareça nada no placeholder -->
-                        <b-form-text for="habilitiesTags"> Principais habilidades </b-form-text>
                         <tags-input input-class="form-control"
                             element-id="habilitiesTags"
-                            v-model="habilities"
+                            v-model="formCurriculum.habilities"
                             :limit = 3
+                            :validate="validateHabilities"
                             :placeholder="placeHolderHabilities"></tags-input> 
                     </b-form-group>
-
+                    <p> {{ $v.formCurriculum.habilities.required }} </p>
                     <!-- Modal footer -->
                     <div class="modal-footer">
                         <b-btn variant="outline-danger" @click="hideModalCurriculum">Fechar</b-btn>
@@ -213,14 +266,14 @@
             </div>
             <div class="modal-footer mt-2">
                 <b-row align-h="end">
-                    <b-btn variant="dark mr-1" @click="hideModalRemove">Não</b-btn>
-                    <b-btn variant="success mr-1" @click="removeCurriculum">Sim</b-btn>
+                    <b-btn variant="outline-dark mr-1" @click="hideModalRemove">Não</b-btn>
+                    <b-btn variant="outline-success mr-1" @click="removeCurriculum">Sim</b-btn>
                 </b-row>  
             </div>
             
         </b-modal>
 
-        <!-- Modal de atualização do currículo -->
+        <!-- Modal de atualização do currículo (Precisa de validação)-->
         <b-modal hide-footer
             :centered="true"        
             size="md"
@@ -269,6 +322,14 @@
 // Imports necessários para fazer a requisição ao servidor
 import API from '../../services/ApiService';
 
+// Import das funções utilizadas do Vuelidate
+import {    required, 
+            minLength, 
+            between, 
+            maxLength, 
+            email, 
+            numeric } from 'vuelidate/lib/validators'
+
 export default {
     name: "portalPessoa",
     data() {
@@ -276,6 +337,21 @@ export default {
             // Variável para controlar a exibição do modal
             modalRegCurriculum: false,
 
+            // Todas as variáveis ficam no objeto formCurriculum
+            // para a validação adequada das informações do
+            // currículo, e apenas com tudo certo é possível 
+            // fazer o envio
+            formCurriculum: {
+                area: null,
+                course: '',
+                file: '',
+                institute: '',
+                graduateYear: '',
+                habilities: [
+                    'smart grid'
+                ], 
+            },
+            
             // Variável para a área de atuação (exatas, biológicas ou humanas)
             area: null,   
 
@@ -453,7 +529,13 @@ export default {
         // Método para esconder o modal de atualizar currículo
         hideModalUpdate () {
             this.$refs.modalUpdate.hide()
-        },      
+        },  
+        
+        // Método para validar as habilidades 
+        validateHabilities ($event) {
+            this.formCurriculum.habilities = $event;
+            console.log("123");
+        }
     },
     computed: {
         isValid() {
@@ -506,6 +588,30 @@ export default {
         }).catch(error => {
             this.error = error.response.data.message;
         });
+    },
+
+    // Validações feitas com o auxílio do Vuelidate
+    validations: {
+        formCurriculum: {
+            area: {
+                required,
+            },
+            course: {
+                required,
+            },
+            file: {
+                required,
+            },
+            institute: {
+                required,
+            },
+            graduateYear: {
+                required,
+            },
+            habilities: {
+                required,    
+            }
+        }
     }
 };
 </script>

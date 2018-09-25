@@ -65,8 +65,8 @@
                         label="E-mail *"
                         label-for="companyEmail">
                         <b-form-input type="email" 
-                            ref="companyEmail"
-                            v-model.trim="formCompany.email"
+                            :value="formCompany.email"
+                            @change.native="formCompany.email = $event.target.value"
                             :state="!$v.formCompany.email.$invalid"
                             aria-describedby="inputCompanyEmailFeedback"
                             placeholder="nome@dominio.com" required></b-form-input>
@@ -177,8 +177,9 @@
                         label="E-mail *"
                         label-for="personEmail">
                         <b-form-input type="email" 
+                            :value="formPerson.email"
+                            @change.native="formPerson.email = $event.target.value"
                             ref="personEmail"
-                            v-model.trim="formPerson.email"
                             :state="!$v.formPerson.email.$invalid"
                             aria-describedby="inputPersonEmailFeedback"
                             placeholder="nome@dominio.com" required></b-form-input>
@@ -265,7 +266,7 @@
             <!-- Título do modal -->   
             <div class="modal-title">
                 <b-row  align-h="center">
-                    <h4><strong>Sucesso</strong></h4>
+                    <h4><strong>Conta cadastrada</strong></h4>
                 </b-row>                
             </div>
             
@@ -305,7 +306,7 @@
 
             <!-- Modal body -->
             <b-row align-h="center">
-                O cadastro não ocorreu corretamente.
+                <b-col cols="8">{{ error }}</b-col>
             </b-row>                            
             <b-row class="mt-2" align-h="center">
                 <b-button size="md" variant="outline-primary" @click="redirectError">
@@ -324,7 +325,12 @@
 import API from '../../services/ApiService';
 
 // Import das funções utilizadas do Vuelidate
-import { required, minLength, between, maxLength, email, numeric } from 'vuelidate/lib/validators'
+import {    required, 
+            minLength, 
+            between, 
+            maxLength, 
+            email, 
+            numeric } from 'vuelidate/lib/validators'
 
 export default {
     name:"home",
@@ -366,8 +372,14 @@ export default {
                 user_type: '',
                 password: '',
             },
-
+            
+            // Variável para exibir o erro proveniente das requisições
+            // ao back-end
             error: null,
+            
+            // Variável que ajuda no redirecionamento para o modal que estava sendo
+            // preenchido quando algum erro ocorre nas requisições (pode assumir valor 'person' ou 'company')
+            whereIsError: null,
         }
     },
     methods: {
@@ -396,7 +408,7 @@ export default {
             // Tratamento do CNPJ
             let cnpj = this.formCompany.identity;
             cnpj = cnpj.replace(/[^\d]/g,"");
-            
+
             // Requisição POST para cadastrar na plataforma              
             API.post('/newAccount', {
                 name: this.formCompany.name,
@@ -409,6 +421,7 @@ export default {
                 this.showModalSuccess();                
             }).catch(error => {
                 this.error = error.response.data.message;
+                this.whereIsError = 'company';
                 this.showModalError();
             }); 
         },
@@ -431,6 +444,7 @@ export default {
                 this.showModalSuccess();
             }).catch(error => {
                 this.error = error.response.data.message;
+                this.whereIsError = 'person';
                 this.showModalError();
             }); 
         },
@@ -476,28 +490,24 @@ export default {
         },
 
         // Redirecionamento para a mesma página
-        // quando ocorre algum erro na troca da senha
-        redirectError () {
-            this.$router.go();
+        // quando ocorre algum erro no cadastro de empresa ou pessoa
+        redirectError() {
+            if(this.whereIsError == 'person') {
+                this.showModalPerson();
+            } else {
+                this.showModalCompany();
+            }
+
+            // Limpa a variável por precaução
+            this.whereIsError = null;
         },
+        
 
         // Redirecionamento para a página de login
-        // quando não ocorre erro na troca da senha
+        // quando ocorre o cadastro corretamente
         redirectSuccess () {
             this.$router.push('/login');
         },
-
-        // // Função necessária para setar o state
-        // // de company e-mail, já que o gerenciamento
-        // // foi prejudicado com a adição da função isUnique
-        // // em validations
-        // defineStateCompanyEmail () {
-        //     if(this.$refs.companyEmail.data == '') {
-        //         this.$refs.companyEmail.state = true;
-        //     } else if({
-
-        //     }
-        // },
     },
     computed: {
         isValid() {
@@ -518,22 +528,22 @@ export default {
                 email,
                 maxLength: maxLength(50),
 
-                // // Função de validação para verificar se o e-mail
-                // // já está cadastrado em alguma conta
-                // isUnique(value) {
-                //     // Em funções próprias é bom, para quando não tiver
-                //     // nada no input retornar true
-                //     if(value === '') return true;
+                // Função de validação para verificar se o e-mail
+                // já está cadastrado em alguma conta
+                isUnique(value) {
+                    // Em funções próprias é bom, para quando não tiver
+                    // nada no input retornar true
+                    if(value === '') return true;
 
-                //     return  API.post('/isEmailUnique',{
-                //                 email: value
-                //             }).then(response => {
-                //                 console.log(response);
-                //                 return true;
-                //             }).catch(() => {
-                //                 return false
-                //             });                    
-                // },
+                    return  API.post('/isEmailUnique',{
+                                email: value
+                            }).then(response => {
+                                console.log(response);
+                                return true;
+                            }).catch(() => {
+                                return false
+                            });                    
+                },
             },
             identity: {
                 required,
@@ -597,20 +607,20 @@ export default {
 
                 // Função de validação para verificar se o e-mail
                 // já está cadastrado em alguma conta
-                // isUnique(value) {
-                //     // Em funções próprias é bom, para quando não tiver
-                //     // nada no input retornar true
-                //     if(value === '') return true;
+                isUnique(value) {
+                    // Em funções próprias é bom, para quando não tiver
+                    // nada no input retornar true
+                    if(value === '') return true;
 
-                //     return  API.post('/isEmailUnique',{
-                //                 email: value
-                //             }).then(response => {
-                //                 console.log(response);
-                //                 return true;
-                //             }).catch(() => {
-                //                 return false
-                //             });                    
-                // },
+                    return  API.post('/isEmailUnique',{
+                                email: value
+                            }).then(response => {
+                                console.log(response);
+                                return true;
+                            }).catch(() => {
+                                return false
+                            });                    
+                },
             },
             identity: {
                 required,

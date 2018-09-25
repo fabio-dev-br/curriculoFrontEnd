@@ -1,6 +1,7 @@
 <template>
     <b-container>
-        <!-- Seção contendo o botão de cadastro de interesses -->
+        <!-- Seção contendo o botão de cadastro de interesses
+             (pesquisa direta não foi implementada ainda) -->
         <section class="pt-2 pb-3">
             <b-container>
                 <b-card>
@@ -84,7 +85,7 @@
             </div>                
         </section>
 
-        <!-- Modal do cadastro de interesses -->
+        <!-- Modal do cadastro de interesses (Precisa de validação) -->
         <b-modal hide-footer
             :centered="true"
             title="Cadastro de Interesses"
@@ -96,7 +97,7 @@
                 <!-- Formulário de interesses, contém: interesses -->
                 <b-form id="interestsForm" @submit="validateInterests">
 
-                    <!-- Habilidades / Foi colocado um limite de 3 habilidades -->
+                    <!-- Habilidades / Não foi colocado um limite -->
                     <b-form-group description="Digite os interesses" label-size="lg">
                         <b-form-text for="interestsTags"> Interesses </b-form-text>
                         <tags-input 
@@ -396,7 +397,7 @@ export default {
         isValid() {
             // Fazer a validação posteriormente
             return true;
-        }
+        },
     },
 
     // Função para recuperar os interesses da empresa presentes no back-end
