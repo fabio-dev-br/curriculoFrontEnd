@@ -333,9 +333,7 @@ export default {
             }                
         },
         {'Content-Type': 'application/x-www-form-urlencoded'},)
-        .then(response => {
-            console.log(response.data.code);                        
-        }).catch(error => {
+        .catch(error => {
             this.showModalExpiration();
             this.errorChangePass = error.response.data.message;
         });     

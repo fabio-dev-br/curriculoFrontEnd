@@ -95,22 +95,25 @@
             <!-- Modal body -->
             <div class="modal-body">
                 <!-- Formulário de interesses, contém: interesses -->
-                <b-form id="interestsForm" @submit="validateInterests">
+                <b-form id="interestsForm" @submit="redirectInterests">
 
                     <!-- Habilidades / Não foi colocado um limite -->
-                    <b-form-group description="Digite os interesses" label-size="lg">
-                        <b-form-text for="interestsTags"> Interesses </b-form-text>
+                    <b-form-group 
+                        label="Interesses *"
+                        label-for="interestsTags">
+
                         <tags-input 
                             input-class="form-control"
                             element-id="interestsTags"
-                            v-model="interests"
+                            v-model="formInterests.interests"
+                            :validate="validateInterests"
                             placeholder="Digite um interesse"></tags-input> 
                     </b-form-group>
 
                     <!-- Modal footer -->
                     <div class="modal-footer">
                         <b-btn variant="outline-danger" @click="hideModalInterests">Fechar</b-btn>
-                        <b-btn variant="outline-success" type="submit">Enviar</b-btn>
+                        <b-btn :disabled="$v.formInterests.$invalid" variant="outline-success" type="submit">Enviar</b-btn>
                     </div>  
                 </b-form>
             </div>
@@ -218,17 +221,31 @@
 import API from '../../services/ApiService';
 import axios from 'axios';
 
+// Import das funções utilizadas do Vuelidate
+import {    required, 
+            minLength, 
+            between, 
+            maxLength, 
+            email, 
+            numeric } from 'vuelidate/lib/validators'
+
 export default {
     name: "portalEmpresa",
     data() {
         return {
             // Variável para controlar a exibição do modal
             modalRegInterests: false,
-
-            // Variável para a adição de interesses
-            interests: [
-                'smart grid'                
-            ],
+            
+            // Todas as variáveis relacionadas à adição de interesses
+            // ficam no objeto formInterests
+            // para a validação adequada das informações do
+            // currículo, e apenas com tudo certo é possível 
+            // fazer o envio
+            formInterests: {
+                interests: [
+                    'smart grid'
+                ],
+            },
 
             // Variável que recebe o erro do back caso
             // haja algum erro na adição de interesses
@@ -275,14 +292,17 @@ export default {
         }
     },
     methods: {
-        // Método para intermediar a validação do formulário
-        validateInterests($event) {
-            if(this.isValid) {            
-                this.addInterests();
-            }
+        // Método para intermediar a validação a adição de interesses
+        redirectInterests($event) {           
+            this.addInterests();
 
             // Previne o recarregamento da página (ou seja, que o evento de submit aconteça)
             $event.preventDefault();
+        },
+
+        // Método para validar os interesses (Falta implementar)
+        validateInterests ($event) {
+            return true;
         },
 
         // Método para adicionar interesses
@@ -293,12 +313,8 @@ export default {
 
             // Requisição POST para adicionar interesses           
             API.post('/addInterests', {
-                interests: this.interests
-            }).then(response => {
-                // Esse log de console é utilizado para utilizar o response declarado
-                // e, assim, o warning, referente à não utilização, não ocorrer na compilação 
-                console.log(response.data.code);
-                
+                interests: this.formInterests.interests
+            }).then(() => {                
                 // Recarrega a página
                 this.$router.go();
             }).catch(error => {
@@ -327,11 +343,7 @@ export default {
             // Requisição POST para adicionar um currículo            
             API.post('/deleteInterests', {
                 interests: this.selected
-            }).then(response => {
-                // Esse log de console é utilizado para utilizar o response declarado
-                // e, assim, o warning, referente à não utilização, não ocorrer na compilação 
-                console.log(response.data.code);
-                
+            }).then(() => {                
                 // Recarrega a página
                 this.$router.go();
             }).catch(error => {
@@ -344,7 +356,8 @@ export default {
         search (value) {
             // Muda o valor de headerSearch para o interesse procurado
             this.headerSearch = value;
-
+            this.headerSearch = this.headerSearch[0].toUpperCase() + this.headerSearch.slice(1);
+            
             // Requisição GET para buscar currículos relacionados ao interesse dado
             // (O APIService.js não é utilizado por problemas com o GET 
             // presente lá, quando se passa parâmetros)
@@ -413,9 +426,11 @@ export default {
             // , provenientes do back-end, de maneira que na parte de remoção 
             // o check-box-group é montado automaticamente (text e value)
             var auxInterests = [];            
-            response.data.data.forEach(element => {                
+            response.data.data.forEach(element => { 
+                // A manipulação dentro de text serve para deixar a primeira letra
+                // maiúscula               
                 auxInterests = auxInterests.concat(
-                    {text: element, value: element}
+                    {text: element[0].toUpperCase() + element.slice(1), value: element}
                 );
                 this.displayInterests = auxInterests;
             });            
@@ -423,7 +438,17 @@ export default {
         }).catch(error => {
             this.error = error.response.data.message;
         });
-    }
+    },
+
+    // Validações, para os forms existentes, feitas com o auxílio do Vuelidate
+    validations: {
+        // Validação do formulário de adição de interesses
+        formInterests: {
+            interests: {
+                required,
+            },
+        },              
+    },
 };
 </script>
 

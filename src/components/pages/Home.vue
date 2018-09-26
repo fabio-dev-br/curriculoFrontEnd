@@ -38,7 +38,7 @@
             <!-- Modal body -->
             <div class="modal-body">
                 <!-- Formulário de empresa, contém: nome, email, cnpj, senha e tipo de usuário(empresa = 0) -->
-                <b-form id="companyForm" @submit="validateCompany">
+                <b-form id="companyForm" @submit="redirectRegCompany">
                     <!-- Nome -->
                     <b-form-group 
                         label="Nome *"
@@ -151,7 +151,7 @@
             <!-- Modal body -->
             <div class="modal-body">
                 <!-- Formulário de pessoa, contém: nome, email, cpf, senha e tipo de usuário(pessoa = 1) -->
-                <b-form id="personForm" @submit="validatePerson">                    
+                <b-form id="personForm" @submit="redirectRegPerson">                    
                     <!-- Nome -->
                     <b-form-group
                         label="Nome *"
@@ -383,22 +383,20 @@ export default {
         }
     },
     methods: {
-        // Método para intermediar a validação do formulário de empresa
-        validateCompany($event) {            
-            if(this.isValid) {
-                this.formCompany.user_type = 0;
-                this.sendInfoCompany();
-            }
+        // Método para intermediar o cadastro de empresa
+        redirectRegCompany($event) {            
+            this.formCompany.user_type = 0;
+            this.sendInfoCompany();
+
             // Previne o recarregamento da página (ou seja, que o evento de submit aconteça)
             $event.preventDefault();
         },
 
-        // Método para intermediar a validação do formulário de pessoa
-        validatePerson($event) {
-            if(this.isValid) {
-                this.formPerson.user_type = 1;
-                this.sendInfoPerson();
-            }
+        // Método para intermediar o cadastro de pessoa
+        redirectRegPerson($event) {
+            this.formPerson.user_type = 1;
+            this.sendInfoPerson();
+
             // Previne o recarregamento da página (ou seja, que o evento de submit aconteça)
             $event.preventDefault();
         },
@@ -509,15 +507,10 @@ export default {
             this.$router.push('/login');
         },
     },
-    computed: {
-        isValid() {
-            // deve garantir que o formulário é valido
-            return true;  
-        },
-    
-    },
-    // Validações feitas com o auxílio do Vuelidate
+
+    // Validações, para os forms existentes, feitas com o auxílio do Vuelidate
     validations: {
+        // Validação do formulário de registro de empresa
         formCompany: {
             name: {                
                 required,
@@ -595,6 +588,8 @@ export default {
                 }
             }
         },
+
+        // Validação do formulário de registro de pessoa
         formPerson: {
             name: {                
                 required,
@@ -681,7 +676,7 @@ export default {
                 }
             }
         },
-    }
+    },
 }
 
 </script>
