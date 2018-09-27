@@ -13,7 +13,7 @@
 
             <b-navbar-nav class="ml-auto">
                 <div id="loginButton" >
-                    <h2><b-badge href="/login" variant="light">Login</b-badge></h2>
+                    <b-btn variant="light" @click="redirectLogin">Login</b-btn>                    
                 </div>
             </b-navbar-nav>
             
@@ -22,5 +22,12 @@
 </template>
 
 <script>
-
+export default {
+    name: "headerHome",
+    methods: {
+        redirectLogin () {
+            this.$router.push('/login');
+        }
+    },
+};
 </script>

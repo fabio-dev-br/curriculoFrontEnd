@@ -3,6 +3,7 @@ import './plugins/bootstrapVue';
 import './plugins/icon';
 import './plugins/tagInput';
 import './validator';
+
 import App from './App.vue';
 
 // Import dos componentes responsáveis pelo roteamento 

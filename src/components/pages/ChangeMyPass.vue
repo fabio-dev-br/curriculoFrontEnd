@@ -4,7 +4,7 @@
         <section class="pt-2 pb-3">            
             <b-card>
                 <!-- Formulário para alteração de senha -->
-                <b-form id="changePasswordForm" @submit="validatePassword">
+                <b-form id="changePasswordForm" @submit="redirectPassword">
                     <b-container slot="header">
                         <h4 class="mb-3" slot="header"> Redefinição de senha </h4>
                         
@@ -177,11 +177,9 @@ export default {
         }
     },
     methods: {
-        // Método para intermediar a validação do formulário
-        validatePassword($event) {
-            if(this.isValid) {            
-                this.changePassword();
-            }
+        // Método para intermediar a mudança de senha
+        redirectPassword($event) {
+            this.changePassword();
 
             // Previne o recarregamento da página (ou seja, que o evento de submit aconteça)
             $event.preventDefault();
@@ -270,11 +268,6 @@ export default {
     },
     
     computed: {
-        isValid() {
-            // Fazer a validação posteriormente
-            return true;
-        },
-
         // Função para determinar o estado do input da senha
         statePassword() {
             return this.validPassword(this.password) ? true : false;

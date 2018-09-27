@@ -47,21 +47,21 @@
                             <ul class="list-group list-group-flush">
                                 <!-- Nome -->
                                 <li class="list-group-item header-gradient border-light">
-                                    <Strong> {{ curriculum.name[0].toUpperCase() + curriculum.name.slice(1) }} </Strong>
+                                    <Strong> {{ firstLetterUp(curriculum.name) }} </Strong>
                                 </li>
                                 <!-- Área -->
                                 <li class="list-group-item border-light">
-                                    <Strong>Área: </Strong> {{ curriculum.area[0].toUpperCase() +  curriculum.area.slice(1) }}
+                                    <Strong>Área: </Strong> {{ firstLetterUp(curriculum.area) }}
                                 </li>
 
                                 <!-- Instituição -->
                                 <li class="list-group-item border-light">
-                                    <Strong>Instituição: </Strong> {{ curriculum.institute[0].toUpperCase() +  curriculum.institute.slice(1) }}
+                                    <Strong>Instituição: </Strong> {{ firstLetterUp(curriculum.institute) }}
                                 </li>
 
                                 <!-- Curso -->
                                 <li class="list-group-item border-light">
-                                    <Strong>Curso: </Strong> {{ curriculum.course[0].toUpperCase() +  curriculum.course.slice(1) }}
+                                    <Strong>Curso: </Strong> {{ firstLetterUp(curriculum.course) }}
                                 </li>
 
                                 <!-- Ano de formação -->
@@ -95,7 +95,7 @@
                                     <span class="tag-format pl-1 mr-2 text-dark"
                                         v-bind:key="hability.id"
                                         v-for="hability in curriculum.habilities">                                            
-                                            {{ hability[0].toUpperCase() +  hability.slice(1) }}                                            
+                                            {{ firstLetterUp(hability) }}
                                     </span>
                                 </li>
                             </ul>
@@ -145,9 +145,14 @@
                             :state="!$v.formCurriculum.area.$invalid" 
                             aria-describedby="inputCurriculumAreaFeedback" required>                            
                             <option value="null" disabled> Escolha a área de atuação...</option>
-                            <option value="exatas"> Exatas </option>
-                            <option value="humanas"> Humanas </option>
-                            <option value="biologicas"> Biológicas </option>
+                            <option value="agricultura e veterinária"> Agricultura e veterinária </option>
+                            <option value="ciências, matemática e computação"> Ciências, matemática e computação </option>
+                            <option value="ciências sociais, negócios e direito"> Ciências sociais, negócios e direito </option>
+                            <option value="educação"> Educação </option>
+                            <option value="engenharia, produção e construção"> Engenharia, produção e construção </option>
+                            <option value="humanidades e artes"> Humanidades e artes </option>
+                            <option value="saúde e bem estar social"> Saúde e bem estar social </option>
+                            <option value="serviços"> Serviços </option>
                         </b-form-select>
                         <b-form-invalid-feedback id="inputCurriculumAreaFeedback">
                             <p v-if="!$v.formCurriculum.area.required">
@@ -216,6 +221,7 @@
                     <b-form-group
                         label="Ano de formação *"
                         label-for="curriculumGradYear">
+                        
                         <b-form-select
                             id="curriculumGradYear"
                             v-model="formCurriculum.graduateYear"
@@ -236,7 +242,8 @@
                         description="Digite no máximo 3 habilidades">
                         <!-- O placeholder foi linkado com uma variável computada para que quando o usuário
                         digitar o número limite de habilidades não apareça nada no placeholder -->
-                        <tags-input input-class="form-control"
+                        <tags-input 
+                            input-class="form-control-tags-input"
                             element-id="habilitiesTags"
                             v-model="formCurriculum.habilities"
                             :limit = 3
@@ -409,6 +416,11 @@ export default {
 
             // Variável contendo todos os anos possíveis para o ano de formação
             yearList: this.listYears(),
+
+            // Método para tornar a primeira letra maiúscula da palavra fornecida
+            firstLetterUp (word) {
+                return word[0].toUpperCase() + word.slice(1);
+            },
         }
     },
     methods: {
@@ -597,12 +609,14 @@ export default {
             },
             course: {
                 required,
+                minLength: minLength(4),
             },
             file: {
                 required,
             },
             institute: {
                 required,
+                minLength: minLength(2),
             },
             graduateYear: {
                 required,
@@ -661,5 +675,20 @@ export default {
     background: #000000;
     height: 2px;
     margin-top: -1px;
+}
+
+.form-control-tags-input {
+    display: block;
+    width: auto;
+    height: auto;
+    min-width: 100%;
+    min-height: calc(2.25rem + 5px);
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
 }
 </style>

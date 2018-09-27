@@ -103,7 +103,7 @@
                         label-for="interestsTags">
 
                         <tags-input 
-                            input-class="form-control"
+                            input-class="form-control-tags-input"
                             element-id="interestsTags"
                             v-model="formInterests.interests"
                             :validate="validateInterests"
@@ -126,7 +126,7 @@
                     <b-card header-tag="header">
                         <b-row slot="header">
                             <b-col>
-                                <h2 slot="header">Resultados - {{ headerSearch }} </h2>
+                                <h2 slot="header">Resultados - {{ firstLetterUp(headerSearch) }} </h2>
                             </b-col>
                             <b-row align-h="end" class="mr-2">
                                 <!-- Botão para fechar a seção de busca -->
@@ -147,21 +147,21 @@
                                     v-for="curriculum in curricula"                                     
                                     :key="curriculum.id"
                                     class="mb-4">
-                                    <h4 class="pl-2 header-gradient"> {{ curriculum.name }} </h4>
+                                    <h4 class="pl-2 header-gradient"> {{ firstLetterUp(curriculum.name) }} </h4>
                                     <ul>
                                         <!-- Área -->
                                         <li>
-                                            <p class="card-text"><Strong>Área: </Strong> {{ curriculum.area }}</p>
+                                            <p class="card-text"><Strong>Área: </Strong> {{ firstLetterUp(curriculum.area) }}</p>
                                         </li>
 
                                         <!-- Instituição -->
                                         <li>
-                                            <p class="card-text"><Strong>Instituição: </Strong> {{ curriculum.institute }}</p>
+                                            <p class="card-text"><Strong>Instituição: </Strong> {{ firstLetterUp(curriculum.institute) }}</p>
                                         </li>
 
                                         <!-- Curso -->
                                         <li>
-                                            <p class="card-text"><Strong>Curso: </Strong> {{ curriculum.course }}</p>
+                                            <p class="card-text"><Strong>Curso: </Strong> {{ firstLetterUp(curriculum.course) }}</p>
                                         </li>
 
                                         <!-- Ano de formação -->
@@ -179,7 +179,7 @@
                                                     Baixar
                                                 </b-link>
                                                 <small class="text-muted">
-                                                    - Última atualização: {{ curriculum.reg_up }}
+                                                    - Última atualização: {{ firstLetterUp(curriculum.reg_up) }}
                                                 </small>                                                
                                             </p>
                                         </li>
@@ -190,7 +190,7 @@
                                             <span class="tag-format pl-1 mr-2 text-dark"
                                                 v-bind:key="hability.id"
                                                 v-for="hability in curriculum.habilities">
-                                                {{ hability }}
+                                                {{ firstLetterUp(hability) }}
                                             </span>
                                         </li>
                                     </ul>                                    
@@ -356,7 +356,6 @@ export default {
         search (value) {
             // Muda o valor de headerSearch para o interesse procurado
             this.headerSearch = value;
-            this.headerSearch = this.headerSearch[0].toUpperCase() + this.headerSearch.slice(1);
             
             // Requisição GET para buscar currículos relacionados ao interesse dado
             // (O APIService.js não é utilizado por problemas com o GET 
@@ -405,11 +404,10 @@ export default {
         hideSearchSection () {
             this.divSearch = !this.divSearch;
         },
-    },
-    computed: {
-        isValid() {
-            // Fazer a validação posteriormente
-            return true;
+
+        // Método para tornar a primeira letra maiúscula da palavra fornecida
+        firstLetterUp (word) {
+            return word[0].toUpperCase() + word.slice(1);
         },
     },
 
@@ -430,7 +428,7 @@ export default {
                 // A manipulação dentro de text serve para deixar a primeira letra
                 // maiúscula               
                 auxInterests = auxInterests.concat(
-                    {text: element[0].toUpperCase() + element.slice(1), value: element}
+                    {text: this.firstLetterUp(element), value: element}
                 );
                 this.displayInterests = auxInterests;
             });            
@@ -491,4 +489,20 @@ export default {
     height: 2px;
     margin-top: -1px;
 }
+
+.form-control-tags-input {
+    display: block;
+    width: auto;
+    height: auto;
+    min-width: 100%;
+    min-height: calc(2.25rem + 5px);
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+}
+
 </style>
