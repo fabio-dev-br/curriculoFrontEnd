@@ -28,23 +28,23 @@
                                 </b-form-group>
     
                                 <!-- Lembrar-me (Lembrete: o input checkbox deve vir antes do label, caso contrário, não funciona)-->
-                                <div class="align-items-start d-flex flex-column">
+                                <!-- <div class="align-items-start d-flex flex-column">
                                     <b-form-checkbox id="loginFormRemember" v-model="remember"
                                         value="remember"
                                         unchecked-value="not_remember">
                                         Lembrar-me
                                     </b-form-checkbox>
-                                </div>                        
+                                </div>                         -->
     
                                 <!-- Esqueceu a senha -->
-                                <div class="d-flex flex-column align-items-center pt-4">                                                                                            
+                                <div class="d-flex flex-column align-items-center pt-2">                                                                                            
                                     <b-link @click="showModalForgotPass">
                                         Esqueceu a senha?
                                     </b-link>
                                 </div>                                                       
     
                                 <!-- Botão de login  -->
-                                <div class="d-flex flex-column align-items-center mt-4 my-2">
+                                <div class="d-flex flex-column align-items-center mt-2 my-2">
                                     <b-btn class="btn btn-outline-dark my-2" type="submit">
                                         Fazer login
                                     </b-btn>                            
@@ -111,7 +111,7 @@
 </template>
 
 <script>
-    // O comentário na linha de baixo desbilita os warnings
+    // O comentário na linha de baixo desabilita os warnings
 /* eslint-disable */
 
 // Imports necessários para fazer a requisição ao servidor
@@ -176,6 +176,7 @@ export default {
                 // para recuperar as informações presentes no back-end
                 this.$store.commit('setAuthToken', response.data.data.token);
 
+                // O console.log abaixo é apenas para debug
                 console.log(this.$store.getters.authToken);
 
                 // Se o usuário é uma empresa (user_type = 0) redireciona para o portal da empresa

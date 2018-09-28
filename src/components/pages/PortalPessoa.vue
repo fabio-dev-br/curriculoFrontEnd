@@ -338,7 +338,7 @@
 </template>
 
 <script>
-    // O comentário na linha de baixo desbilita os warnings
+    // O comentário na linha de baixo desabilita os warnings
 /* eslint-disable */
 
 // Imports necessários para fazer a requisição ao servidor

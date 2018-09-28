@@ -34,7 +34,7 @@
                                 </b-button>           
                             
                                 <!-- Botão para preparar para a remoção de interesses -->
-                                <b-button class="btn btn-sm bg-warning border-warning" @click="prepareRemove"> 
+                                <b-button class="btn btn-sm bg-warning border-warning" v-if="showRemove" @click="prepareRemove"> 
                                     <icon name="minus"></icon>
                                 </b-button>
                             </template>                                      
@@ -71,14 +71,14 @@
                     <div slot="footer" v-if="alterToRemoveInterests">
                         <b-row align-h="end" class="mr-2">
                             <!-- Botão para cancelar a remoção dos interesses -->
-                            <b-button class="btn btn-sm btn-danger text-light mr-1" @click="prepareRemove"> 
+                            <b-btn variant="danger mr-1" @click="prepareRemove"> 
                                 Cancelar
-                            </b-button>
+                            </b-btn>
 
                             <!-- Botão para confirmar a remoção dos interesses -->
-                            <b-button class="btn btn-sm btn-warning text-light" @click="removeInterests"> 
+                            <b-btn variant="warning" @click="removeInterests"> 
                                 Confirmar
-                            </b-button>        
+                            </b-btn>        
                         </b-row>                            
                     </div>
                 </b-card>                
@@ -214,7 +214,7 @@
 </template>
 
 <script>
-    // O comentário na linha de baixo desbilita os warnings
+    // O comentário na linha de baixo desabilita os warnings
 /* eslint-disable */
 
 // Imports necessários para fazer a requisição ao servidor
@@ -289,6 +289,9 @@ export default {
             // Variável que recebe o erro do back caso
             // haja algum erro na busca de interesses
             errorSearchInterest: null,
+
+            // Variável para controlar a opção de remover
+            showRemove: true,
         }
     },
     methods: {
@@ -423,15 +426,21 @@ export default {
             // auxInterests é um vetor que auxilia na organização dos dados
             // , provenientes do back-end, de maneira que na parte de remoção 
             // o check-box-group é montado automaticamente (text e value)
-            var auxInterests = [];            
-            response.data.data.forEach(element => { 
-                // A manipulação dentro de text serve para deixar a primeira letra
-                // maiúscula               
-                auxInterests = auxInterests.concat(
-                    {text: this.firstLetterUp(element), value: element}
-                );
-                this.displayInterests = auxInterests;
-            });            
+            var auxInterests = [];   
+            // Verifica se há algum resultado para mostrar
+            if(response.data.data.length != 0) {
+                response.data.data.forEach(element => { 
+                    // A manipulação dentro de text serve para deixar a primeira letra
+                    // maiúscula               
+                    auxInterests = auxInterests.concat(
+                        {text: this.firstLetterUp(element), value: element}
+                    );
+                    this.displayInterests = auxInterests;
+                });            
+            } else {
+                this.showRemove = false;
+            }
+
             this.divInterests = true;
         }).catch(error => {
             this.error = error.response.data.message;

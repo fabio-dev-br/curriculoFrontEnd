@@ -1,5 +1,4 @@
 import Vue from "vue";
-// import { store } from "./../store";
 
 import Home from "./../components/pages/Home";
 import Login from "./../components/pages/Login";
@@ -23,19 +22,6 @@ const router = new VueRouter({
 });
 
 Vue.use(VueRouter);
-
-// router.beforeEach((to, from, next) => {
-//   switch (to.name) {
-//     case "domains":
-//     case "aliases":
-//     case "emails":
-//       if (!store.getters.authToken) {
-//         next({ path: "/", replace: true });
-//       }
-//       break;
-//   }
-//   next();
-// });
 
 export {
   router

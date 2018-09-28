@@ -278,8 +278,11 @@
                 O cadastro ocorreu com sucesso.
             </b-row>                            
             <b-row class="mt-2" align-h="center">
-                <b-button size="md" variant="outline-primary" @click="redirectSuccess">
-                    Login
+                <b-button v-if="redirectTo == 'company'" size="md" variant="outline-primary" @click="redirectCompany">
+                    Acessar
+                </b-button>
+                <b-button v-else size="md" variant="outline-primary" @click="redirectPerson">
+                    Acessar
                 </b-button>
             </b-row>
         </b-modal>               
@@ -380,6 +383,10 @@ export default {
             // Variável que ajuda no redirecionamento para o modal que estava sendo
             // preenchido quando algum erro ocorre nas requisições (pode assumir valor 'person' ou 'company')
             whereIsError: null,
+
+            // Variável que auxilia no redirecionamento do usuário que acabou 
+            // de ser cadastrado, para o portal correto
+            redirectTo: null,
         }
     },
     methods: {
@@ -415,7 +422,8 @@ export default {
                 user_type: this.formCompany.user_type,
                 password: this.formCompany.password
             }).then(() => {
-                // Redireciona para o login em caso de sucesso
+                // Redireciona para o portal da empresa em caso de sucesso
+                this.redirectTo = 'company';
                 this.showModalSuccess();                
             }).catch(error => {
                 this.error = error.response.data.message;
@@ -427,7 +435,7 @@ export default {
         // Método para enviar as informações para o cadastro de pessoa
         sendInfoPerson() {      
             // Tratamento do CPF
-            let cpf = this.formCompany.identity;
+            let cpf = this.formPerson.identity;
             cpf = cpf.replace(/[^\d]/g,"");
             
             // Requisição POST para cadastrar na plataforma              
@@ -439,6 +447,7 @@ export default {
                 password: this.formPerson.password
             }).then(() => {
                 // Redireciona para o login em caso de sucesso
+                this.redirectTo = 'person';
                 this.showModalSuccess();
             }).catch(error => {
                 this.error = error.response.data.message;
@@ -501,11 +510,50 @@ export default {
         },
         
 
-        // Redirecionamento para a página de login
+        // Redirecionamento para portal de empresa
         // quando ocorre o cadastro corretamente
-        redirectSuccess () {
-            this.$router.push('/login');
+        redirectCompany () {
+            // Requisição POST para fazer o login
+            API.post('/login2', {
+                email: this.formCompany.email,
+                password: this.formCompany.password
+            }).then(response => {
+                // Armazena o token recebido do back-end, este que é usado
+                // para recuperar as informações presentes no back-end
+                this.$store.commit('setAuthToken', response.data.data.token);
+                
+                // O console.log abaixo é apenas para debug
+                console.log(this.$store.getters.authToken);
+
+                // Redireciona para o portal de empresa
+                this.$router.push('/portal-empresa');
+            }).catch(error => {
+                this.error = error.response.data.message;
+            });
         },
+
+        // Redirecionamento para portal de pessoa
+        // quando ocorre o cadastro corretamente
+        redirectPerson () {
+            // Requisição POST para fazer o login
+            API.post('/login2', {
+                email: this.formPerson.email,
+                password: this.formPerson.password
+            }).then(response => {
+                // Armazena o token recebido do back-end, este que é usado
+                // para recuperar as informações presentes no back-end
+                this.$store.commit('setAuthToken', response.data.data.token);
+
+                // O console.log abaixo é apenas para debug
+                console.log(this.$store.getters.authToken);
+                
+                // Redireciona para o portal de pessoa
+                this.$router.push('/portal-pessoa');
+            }).catch(error => {
+                this.error = error.response.data.message;
+            });
+        },
+
     },
 
     // Validações, para os forms existentes, feitas com o auxílio do Vuelidate
