@@ -363,7 +363,7 @@ export default {
             // Requisição GET para buscar currículos relacionados ao interesse dado
             // (O APIService.js não é utilizado por problemas com o GET 
             // presente lá, quando se passa parâmetros)
-            axios.get('http://localhost:3000/searchCurByInt', {
+            axios.get('http://localhost:2999/searchCurByInt', {
                 params: {
                     interests: value
                 }                

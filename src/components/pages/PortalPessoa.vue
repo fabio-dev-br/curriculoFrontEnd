@@ -135,7 +135,7 @@
             <!-- Modal body -->
             <div class="modal-body">
                 <!-- Formulário de currículo, contém: área, curso, arquivo, instituto, ano de formação, id de usuário e habilidades -->
-                <b-form id="curriculumForm" @submit="redirectAddCurriculum">
+                <b-form id="curriculumForm" @submit.prevent="redirectAddCurriculum">
                     <!-- Área -->
                     <b-form-group
                         label="Àrea *"
@@ -291,7 +291,7 @@
             <!-- Modal body -->
             <div class="modal-body">
                 <!-- Formulário de atualização de currículo -->
-                <b-form id="curriculumUpdateForm" @submit="redirectUpdate">                    
+                <b-form id="curriculumUpdateForm" @submit.prevent="redirectUpdate">
                     <!-- Arquivo de currículo -->
                     <!-- O <b-form-file> não suporta o <b-form-invalid-feedback> -->
                     <b-form-group
@@ -460,7 +460,7 @@ export default {
             formData.append('file', this.formCurriculum.file);
             formData.append('institute', this.formCurriculum.institute);
             formData.append('graduate_year', this.formCurriculum.graduateYear);
-            for (var i = 0; i < this.habilities.length; i++) {
+            for (var i = 0; i < this.formCurriculum.habilities.length; i++) {
                 formData.append('habilities[]', this.formCurriculum.habilities[i]);
             }
             

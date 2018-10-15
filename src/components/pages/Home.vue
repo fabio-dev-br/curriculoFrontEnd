@@ -14,13 +14,13 @@
                     <b-col class="mt-3">
                         <!-- Botão para abrir o modal de cadastro de empresas -->
                         <b-btn variant="outline-dark" size="lg" @click="showModalCompany"> 
-                            Cadastro de empresas 
+                            Cadastrar empresa 
                         </b-btn>
                     </b-col>
                     <b-col class="mt-3">
                         <!-- Botão para abrir o modal de cadastro de pessoas -->
                         <b-btn variant="outline-dark" size="lg" @click="showModalPerson">
-                            Cadastro de pessoas
+                            Cadastrar pessoa
                         </b-btn>
                     </b-col>
                 </b-row>                        
@@ -732,11 +732,11 @@ export default {
 <style>
 
 .welcome-section {
-    background-color: rgba(253, 223, 49, 0.952);
+    background-color: rgba(17, 0, 255, 0.336);
 }
   
 .welcome-section {
-    min-height: 300px;
+    min-height: 100px;
 }
   
 @media (min-width: 576px) {
@@ -752,6 +752,6 @@ export default {
 }
 
 form :invalid {
-    background: white;
+    background: rgba(255, 0, 0, 0.171);
 }
 </style>
