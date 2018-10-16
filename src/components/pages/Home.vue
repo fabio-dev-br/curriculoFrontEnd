@@ -521,10 +521,6 @@ export default {
                 // Armazena o token recebido do back-end, este que é usado
                 // para recuperar as informações presentes no back-end
                 this.$store.commit('setAuthToken', response.data.data.token);
-                
-                // O console.log abaixo é apenas para debug
-                console.log(this.$store.getters.authToken);
-
                 // Redireciona para o portal de empresa
                 this.$router.push('/portal-empresa');
             }).catch(error => {
@@ -542,11 +538,7 @@ export default {
             }).then(response => {
                 // Armazena o token recebido do back-end, este que é usado
                 // para recuperar as informações presentes no back-end
-                this.$store.commit('setAuthToken', response.data.data.token);
-
-                // O console.log abaixo é apenas para debug
-                console.log(this.$store.getters.authToken);
-                
+                this.$store.commit('setAuthToken', response.data.data.token);                
                 // Redireciona para o portal de pessoa
                 this.$router.push('/portal-pessoa');
             }).catch(error => {

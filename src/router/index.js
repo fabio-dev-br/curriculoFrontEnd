@@ -5,6 +5,7 @@ import Login from "./../components/pages/Login";
 import PortalPessoa from "./../components/pages/PortalPessoa";
 import PortalEmpresa from "./../components/pages/PortalEmpresa";
 import ChangeMyPass from "./../components/pages/ChangeMyPass";
+import Logout from "./../components/pages/Logout";
 
 import VueRouter from "vue-router";
 
@@ -14,6 +15,8 @@ const routes = [
   { path: "/portal-pessoa", name: "portal-pessoa", component: PortalPessoa },
   { path: "/portal-empresa", name: "portal-empresa", component: PortalEmpresa },
   { path: "/change-my-pass", name: "change-my-pass", component: ChangeMyPass },
+  {
+    path: '/logout', name: 'logout',component: Logout}
 ];
 
 const router = new VueRouter({

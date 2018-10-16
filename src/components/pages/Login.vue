@@ -175,6 +175,7 @@ export default {
                 // Armazena o token recebido do back-end, este que é usado
                 // para recuperar as informações presentes no back-end
                 this.$store.commit('setAuthToken', response.data.data.token);
+                this.$store.commit('setuserType', response.data.data.user_type);
 
                 // O console.log abaixo é apenas para debug
                 console.log(this.$store.getters.authToken);

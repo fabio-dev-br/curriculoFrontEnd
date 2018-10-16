@@ -310,11 +310,7 @@ export default {
 
         // Método para adicionar interesses
         addInterests() {
-            // O token  do usuário é recuperado e adicionado ao header da 
-            // requisição para enviá-lo ao back-end
-            API.token = this.$store.getters.authToken;
-
-            // Requisição POST para adicionar interesses           
+            // Requisição POST para adicionar interesses
             API.post('/addInterests', {
                 interests: this.formInterests.interests
             }).then(() => {                
@@ -415,11 +411,7 @@ export default {
     },
 
     // Função para recuperar os interesses da empresa presentes no back-end
-    created: function () {
-        // O token  do usuário é recuperado e adicionado ao header da 
-        // requisição para enviá-lo ao back-end
-        API.token = this.$store.getters.authToken;
-        
+    created: function () {        
         // Requisição POST para fazer o login
         API.get('/searchInt')
         .then(response => {

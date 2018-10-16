@@ -1,10 +1,10 @@
 import axios from 'axios';
 import qs from 'qs';
+import { store } from './../store'
 
 const API_URL = process.env.VUE_APP_BASE_URI;
 
 export default {
-    token: '',
     get(url, data) {
         return this.request('GET', url, qs.stringify(data));
     },
@@ -27,8 +27,8 @@ export default {
     },
     request(method, url, data = {}, headers = {'Content-Type': 'application/x-www-form-urlencoded'}) {
 
-        if(this.token) {
-            headers['Authorization'] = 'Bearer ' + this.token;
+        if(store.authToken) {
+            headers['Authorization'] = 'Bearer ' + store.authToken;
         }
         return axios(API_URL + url, {
           method: method,
