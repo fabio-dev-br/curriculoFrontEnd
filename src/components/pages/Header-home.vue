@@ -35,9 +35,11 @@ export default {
             this.$router.push('/login');
         },
         redirecthome () {
-            if(user_type == 0) {
+            
+            // user_type = this.$store.getters.user_type;
+            if(this.$store.getters.user_type == 0) {
                 this.$router.push('/portal-empresa');
-            } else (user_type == 1) {
+            } else(this.$store.getters.user_type == 1); {
                 this.$router.push('/portal-pessoa');
             }
         }
