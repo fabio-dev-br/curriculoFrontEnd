@@ -9,7 +9,14 @@
                 <b-navbar-nav>
                     <b-nav-item @click="redirecthome">Início</b-nav-item>
                 </b-navbar-nav>
-            </b-collapse>                                
+                <b-navbar-nav>
+                    <b-nav-item @click="redirectsobre" >Sobre</b-nav-item>
+                </b-navbar-nav>
+            </b-collapse>   
+            
+            
+            
+
 
             <b-navbar-nav class="ml-auto">
                 <div id="loginButton" >
@@ -20,10 +27,14 @@
                         Login
                     </b-btn>
                     <div v-else>
-                        <b-btn   @click="logout">
-                        Logout
-                         </b-btn>
-                         <b-nav-item >Bem Vindo {{firstLetterUp ($store.getters.name) }} </b-nav-item>
+                        <b-nav-item-dropdown right>
+                            <!-- Using button-content slot -->
+                            <template slot="button-content">
+                              <em>{{firstLetterUp ($store.getters.name) }}</em>
+                            </template>
+                            <b-dropdown-item href="#">Perfil</b-dropdown-item>
+                            <b-dropdown-item @click="logout">Sair</b-dropdown-item>
+                          </b-nav-item-dropdown>
                     </div>
                 
                 </div>
@@ -47,6 +58,14 @@ export default {
             } else {
                 this.$router.push('/portal-pessoa');
             }
+            
+        },
+        redirectsobre () {
+            
+            
+                this.$router.push('/sobre');
+           
+            
         },
         logout() {
             this.$store.commit('setAuthToken', null);

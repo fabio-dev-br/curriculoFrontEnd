@@ -3,7 +3,7 @@
     <section>
         <section class="welcome-section d-flex align-items-center">
             <b-container class="text-center text-dark">
-                <h1>Bem-vindo ao Currículo Incit</h1>  
+                <h1 class="inicio">Bem-vindo ao Currículo Incit</h1>  
             </b-container>
         </section>
         <b-container class="p-3">                        
@@ -724,7 +724,20 @@ export default {
 <style>
 
 .welcome-section {
-    background-color: rgba(17, 0, 255, 0.336);
+    /* background-color: rgba(17, 0, 255, 0.336); */
+    /* background-image:url("curriculo-incit/public/imagens/inicial.jpg"); */
+    background-image: url("/imagens/inicial2.jpg");
+    background-repeat: repeat-x;
+    opacity: 0.7;
+    filter: alpha(opacity=70); /* For IE8 and earlier */
+}
+.inicio {
+    
+    color: rgb(255, 0, 0);
+    text-shadow: 3px 2px rgb(0, 0, 0);
+    text-align: center;
+    font-size: 400%;
+    
 }
   
 .welcome-section {
