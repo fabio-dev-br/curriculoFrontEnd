@@ -27,8 +27,8 @@ export default {
     },
     request(method, url, data = {}, headers = {'Content-Type': 'application/x-www-form-urlencoded'}) {
 
-        if(store.authToken) {
-            headers['Authorization'] = 'Bearer ' + store.authToken;
+        if(store.getters.authToken) {
+            headers['Authorization'] = 'Bearer ' + store.getters.authToken;
         }
         return axios(API_URL + url, {
           method: method,

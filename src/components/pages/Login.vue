@@ -175,22 +175,18 @@ export default {
                 // Armazena o token recebido do back-end, este que é usado
                 // para recuperar as informações presentes no back-end
                 this.$store.commit('setAuthToken', response.data.data.token);
+                this.$store.commit('setName', response.data.data.nome);
                 this.$store.commit('setuserType', response.data.data.user_type);
-
-                // O console.log abaixo é apenas para debug
-                console.log(this.$store.getters.authToken);
+                // this.$store.commit('setuserType', response.data.data.user_type);
 
                 // Se o usuário é uma empresa (user_type = 0) redireciona para o portal da empresa
                 if(response.data.data.user_type == 0) {
                     this.$router.push('/portal-empresa');
-                }
-                
-                // Se o usuário é uma pessoa (user_type = 1) redireciona para o portal de pessoa
-                if(response.data.data.user_type == 1) {
+                } else {
                     this.$router.push('/portal-pessoa');
                 }
             }).catch(error => {
-                this.error = error.response.data.message;
+                this.error = error.message;
             });
         },
 

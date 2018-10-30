@@ -13,14 +13,20 @@
 
             <b-navbar-nav class="ml-auto">
                 <div id="loginButton" >
-                    <b-btn  v-if="loggedIn" variant="light" @click="redirectLogin">Login</b-btn>  
-                   
-
-                    
-                    <b-btn  v-if="loggedIn"><router-link :to="{ name: 'logout' }">Logout</router-link></b-btn>                   
+                    <b-btn  variant="light" 
+                        @click="redirectLogin"
+                        v-if="!isLoggedIn"
+                        >
+                        Login
+                    </b-btn>
+                    <div v-else>
+                        <b-btn   @click="logout">
+                        Logout
+                         </b-btn>
+                         <b-nav-item >Bem Vindo {{firstLetterUp ($store.getters.name) }} </b-nav-item>
+                    </div>
+                
                 </div>
-                <b-nav-item >BEM VINDO : </b-nav-item>
-               
             </b-navbar-nav>
             
         </b-navbar>
@@ -35,20 +41,31 @@ export default {
             this.$router.push('/login');
         },
         redirecthome () {
-            
             // user_type = this.$store.getters.user_type;
-            if(this.$store.getters.user_type == 0) {
+            if(this.$store.getters.userType == 0) {
                 this.$router.push('/portal-empresa');
-            } else(this.$store.getters.user_type == 1); {
+            } else {
                 this.$router.push('/portal-pessoa');
             }
+        },
+        logout() {
+            this.$store.commit('setAuthToken', null);
+            this.$store.commit('setName', null);
+            this.$store.commit('setuserType', null);
+            
+            this.$router.replace('/');
+
+            // @todo: limpar tambem o nome da pessoa ou empresa
+        },
+        firstLetterUp (word) {
+            return word[0].toUpperCase() + word.slice(1);
         }
     },
     computed: {
-    loggedIn() {
-      return this.$store.getters.loggedIn
+        isLoggedIn() {
+            return this.$store.getters.authToken;
+        }
     }
-  }  
 };
 
 </script>

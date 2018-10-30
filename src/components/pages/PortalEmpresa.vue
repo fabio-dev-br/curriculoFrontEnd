@@ -317,7 +317,7 @@ export default {
                 // Recarrega a página
                 this.$router.go();
             }).catch(error => {
-                this.errorAddInterest = error.response.data.message;
+                this.errorAddInterest = error.message;;
             });
         },
 
@@ -346,7 +346,7 @@ export default {
                 // Recarrega a página
                 this.$router.go();
             }).catch(error => {
-                this.errorRemoveInterest = error.response.data.message;
+                this.errorRemoveInterest = error.message;
             });
         },
 
@@ -435,7 +435,7 @@ export default {
 
             this.divInterests = true;
         }).catch(error => {
-            this.error = error.response.data.message;
+            this.error = error.response.message;
         });
     },
 

@@ -10,7 +10,8 @@ export const store = new Vuex.Store({
     //layout: "SimpleLayout",
     //define a variavel
     authToken: null,
-    userType: null
+    userType: null,
+    name: null
   },
   mutations: {
     // setLayout(state, payload) {
@@ -22,7 +23,12 @@ export const store = new Vuex.Store({
     },
     setuserType(state, userType) {
       state.userType = userType;
-    }
+    },
+     setName(state, name) {
+      state.name = name;
+  
+     },
+    
   },
   getters: {
     // layout(state) {
@@ -32,11 +38,12 @@ export const store = new Vuex.Store({
     authToken(state) {
       return state.authToken;
     },
-    loggedIn(state) {
-      return state.authToken !== null
-    },
     userType(state) {
       return state.userType;
-    }
+    },
+    
+    name(state) {
+      return state.name;
+    },
   }
 });

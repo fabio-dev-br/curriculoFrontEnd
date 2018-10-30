@@ -596,7 +596,7 @@ export default {
                 this.showCurriculum = true;
             }
         }).catch(error => {
-            this.error = error.response.data.message;
+            this.error = error.message;
         });
     },
 
