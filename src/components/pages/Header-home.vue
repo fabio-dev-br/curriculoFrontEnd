@@ -32,7 +32,7 @@
                             <template slot="button-content">
                               <em>{{firstLetterUp ($store.getters.name) }}</em>
                             </template>
-                            <b-dropdown-item href="#">Perfil</b-dropdown-item>
+                            <b-dropdown-item @click="perfil">Perfil</b-dropdown-item>
                             <b-dropdown-item @click="logout">Sair</b-dropdown-item>
                           </b-nav-item-dropdown>
                     </div>
@@ -67,6 +67,13 @@ export default {
            
             
         },
+        perfil () {
+            
+            
+            this.$router.push('/perfil');
+       
+        
+    },
         logout() {
             this.$store.commit('setAuthToken', null);
             this.$store.commit('setName', null);
