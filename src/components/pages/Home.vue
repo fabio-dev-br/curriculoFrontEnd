@@ -3,7 +3,7 @@
     <section>
         <section class="welcome-section d-flex align-items-center">
             <b-container class="text-center text-dark">
-                <h1 class="inicio">Bem-vindo ao Currículo Incit</h1>  
+                <h1 class="inicio">Bem-vindo ao Currículo Incit!</h1>  
             </b-container>
         </section>
         <b-container class="p-3">                        
