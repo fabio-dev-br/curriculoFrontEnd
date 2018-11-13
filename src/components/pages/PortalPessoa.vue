@@ -468,7 +468,7 @@ export default {
             // e o arquivo de currículo
             API.postFile('/addCurriculum', formData).then(() => {                
                 // Recarrega a página
-                this.$router.go();
+                // this.$router.go();
             });
         },
 
