@@ -1,3 +1,20 @@
+Skip to content
+ 
+Search or jump to…
+
+Pull requests
+Issues
+Marketplace
+Explore
+ @fabiogresko Sign out
+0
+0 0 fabiogresko/curriculoFrontEnd
+ Code  Issues 0  Pull requests 0  Projects 0  Wiki  Insights  Settings
+curriculoFrontEnd/src/components/pages/Header-home.vue
+88587e4  13 days ago
+@ViDenadai ViDenadai interface perfil
+    
+98 lines (76 sloc)  2.83 KB
 <!-- Componente de header da página home -->
 <template>
     <header>
@@ -9,7 +26,14 @@
                 <b-navbar-nav>
                     <b-nav-item @click="redirecthome">Início</b-nav-item>
                 </b-navbar-nav>
-            </b-collapse>                                
+                <b-navbar-nav>
+                    <b-nav-item @click="redirectsobre" >Sobre</b-nav-item>
+                </b-navbar-nav>
+            </b-collapse>   
+            
+            
+            
+
 
             <b-navbar-nav class="ml-auto">
                 <div id="loginButton" >
@@ -20,10 +44,14 @@
                         Login
                     </b-btn>
                     <div v-else>
-                        <b-btn   @click="logout">
-                        Logout
-                         </b-btn>
-                         <b-nav-item >Bem Vindo {{firstLetterUp($store.getters.name) }} </b-nav-item>
+                        <b-nav-item-dropdown right>
+                            <!-- Using button-content slot -->
+                            <template slot="button-content">
+                              <em>{{firstLetterUp ($store.getters.name) }}</em>
+                            </template>
+                            <b-dropdown-item @click="perfil">Perfil</b-dropdown-item>
+                            <b-dropdown-item @click="logout">Sair</b-dropdown-item>
+                          </b-nav-item-dropdown>
                     </div>
                 
                 </div>
@@ -47,7 +75,22 @@ export default {
             } else {
                 this.$router.push('/portal-pessoa');
             }
+            
         },
+        redirectsobre () {
+            
+            
+                this.$router.push('/sobre');
+           
+            
+        },
+        perfil () {
+            
+            
+            this.$router.push('/perfil');
+       
+        
+    },
         logout() {
             this.$store.commit('setAuthToken', null);
             this.$store.commit('setName', null);
@@ -57,13 +100,7 @@ export default {
             // @todo: limpar tambem o nome da pessoa ou empresa
         },
         firstLetterUp (word) {
-            if(!word){
-                return ''
-            }
-            else{
             return word[0].toUpperCase() + word.slice(1);
-            }
-           
         }
     },
     computed: {
